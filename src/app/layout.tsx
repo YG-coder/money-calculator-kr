@@ -45,6 +45,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" data-scroll-behavior="smooth">
+      <head>
+        {/* 🔥 애드센스 코드 추가 */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6405509957088169"
+          crossOrigin="anonymous"
+        ></script>
+      </head>
+
       <body className="min-h-screen flex flex-col bg-slate-50 text-slate-900 antialiased">
         <Header />
         <main className="flex-1">{children}</main>
