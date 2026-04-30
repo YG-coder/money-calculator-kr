@@ -3,17 +3,31 @@ import type { MetadataRoute } from "next";
 import { BASE_URL } from "@/lib/metadata";
 import { blogPosts } from "@/data/blogPosts";
 
+type StaticPage = {
+  path: string;
+  priority: number;
+  freq: MetadataRoute.Sitemap[0]["changeFrequency"];
+};
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  const staticPages = [
+  const staticPages: StaticPage[] = [
     { path: "", priority: 1.0, freq: "daily" },
     { path: "loan-interest-calculator", priority: 0.9, freq: "monthly" },
     { path: "amortization-calculator", priority: 0.9, freq: "monthly" },
     { path: "jeonse-loan-calculator", priority: 0.9, freq: "monthly" },
     { path: "prepayment-calculator", priority: 0.9, freq: "monthly" },
-    { path: "real-estate/acquisition-tax-calculator", priority: 0.9, freq: "monthly" },
-    { path: "real-estate/rent-vs-jeonse-calculator", priority: 0.9, freq: "monthly" },
+    {
+      path: "real-estate/acquisition-tax-calculator",
+      priority: 0.9,
+      freq: "monthly",
+    },
+    {
+      path: "real-estate/rent-vs-jeonse-calculator",
+      priority: 0.9,
+      freq: "monthly",
+    },
     { path: "blog", priority: 0.8, freq: "daily" },
     { path: "about", priority: 0.6, freq: "monthly" },
     { path: "contact", priority: 0.5, freq: "monthly" },
