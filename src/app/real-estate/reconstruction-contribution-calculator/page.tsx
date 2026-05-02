@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { buildMetadata, BASE_URL } from "@/lib/metadata";
 import CalcShell, { type CalcExample } from "@/components/calculator/CalcShell";
+import ReconstructionContributionCalc from "@/components/calculator/ReconstructionContributionCalc";
 
 export const metadata: Metadata = buildMetadata({
     slug: "real-estate/reconstruction-contribution-calculator",
@@ -66,11 +67,7 @@ export default function ReconstructionContributionPage() {
                 icon="🏗️"
                 slug="real-estate/reconstruction-contribution-calculator"
                 breadcrumb={crumbs}
-                calculator={
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-400">
-                        계산기 UI는 다음 단계에서 구현
-                    </div>
-                }
+                calculator={<ReconstructionContributionCalc />}
                 guide={
                     <>
                         <h2 className="text-xl font-bold text-slate-900">

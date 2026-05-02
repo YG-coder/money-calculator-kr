@@ -32,17 +32,15 @@ const CALCS: {
   },
   {
     title: "양도소득세 계산기",
-    desc: "주택·토지 양도 시 양도소득세를 계산합니다.",
-    href: "#",
+    desc: "취득가액, 양도가액, 필요경비, 보유기간을 기준으로 예상 양도소득세를 계산합니다.",
+    href: "/real-estate/capital-gains-tax-calculator",
     icon: "📐",
-    disabled: true,
   },
   {
     title: "재건축 분담금 계산기",
-    desc: "재건축 조합원 분담금을 추정 계산합니다.",
-    href: "#",
+    desc: "권리가액, 종후자산가액, 비례율 등을 기준으로 예상 재건축 조합원 분담금을 계산합니다.",
+    href: "/real-estate/reconstruction-contribution-calculator",
     icon: "🏗️",
-    disabled: true,
   },
 ];
 

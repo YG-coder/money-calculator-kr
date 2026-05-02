@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { buildMetadata, BASE_URL } from "@/lib/metadata";
 import CalcShell, { type CalcExample } from "@/components/calculator/CalcShell";
+import CapitalGainsTaxCalc from "@/components/calculator/CapitalGainsTaxCalc";
 
 export const metadata: Metadata = buildMetadata({
     slug: "real-estate/capital-gains-tax-calculator",
@@ -51,11 +52,7 @@ export default function CapitalGainsTaxPage() {
                 icon="📐"
                 slug="real-estate/capital-gains-tax-calculator"
                 breadcrumb={crumbs}
-                calculator={
-                    <div className="rounded-xl border p-6 text-center text-slate-400">
-                        계산기 UI는 다음 단계에서 구현
-                    </div>
-                }
+                calculator={<CapitalGainsTaxCalc />}
                 guide={
                     <>
                         <h2 className="text-xl font-bold">양도소득세란?</h2>
