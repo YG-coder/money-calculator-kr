@@ -198,14 +198,14 @@ export default function AcquisitionTaxCalculatorPage() {
             icon: "⚖️",
           },
           {
-            label: "전세대출 계산기",
-            href: "/jeonse-loan-calculator",
-            icon: "🏠",
+            label: "양도소득세 계산기",
+            href: "/real-estate/capital-gains-tax-calculator",
+            icon: "📐",
           },
           {
-            label: "대출이자 계산기",
-            href: "/loan-interest-calculator",
-            icon: "🏦",
+            label: "재건축 분담금 계산기",
+            href: "/real-estate/reconstruction-contribution-calculator",
+            icon: "🏗️",
           },
         ]}
         relatedGuides={[

@@ -202,9 +202,21 @@ export default function JeonseVsWolseCalculatorPage() {
         examples={EXAMPLES}
         faq={FAQ}
         relatedCalcs={[
-          { label: "취득세 계산기",   href: "/real-estate/acquisition-tax-calculator", icon: "🏠" },
-          { label: "전세대출 계산기", href: "/jeonse-loan-calculator",                 icon: "🏠" },
-          { label: "대출이자 계산기", href: "/loan-interest-calculator",               icon: "🏦" },
+          {
+            label: "취득세 계산기",
+            href: "/real-estate/acquisition-tax-calculator",
+            icon: "🏠",
+          },
+          {
+            label: "양도소득세 계산기",
+            href: "/real-estate/capital-gains-tax-calculator",
+            icon: "📐",
+          },
+          {
+            label: "재건축 분담금 계산기",
+            href: "/real-estate/reconstruction-contribution-calculator",
+            icon: "🏗️",
+          },
         ]}
         relatedGuides={[
           { label: "전세 vs 월세 어떤 게 유리한가",  href: "/blog/jeonse-vs-wolse" },
