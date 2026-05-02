@@ -87,19 +87,116 @@ export default function JeonseVsWolseCalculatorPage() {
         calculator={<JeonseVsWolseCalc />}
         guide={
           <>
+            <h2 className="text-xl font-bold text-slate-900">
+              전세 vs 월세 계산기란?
+            </h2>
+
             <p>
-              <strong>전세</strong>는 보증금이 크지만 월 비용이 없고,
-              <strong>월세</strong>는 보증금이 작지만 매달 임대료를 냅니다.
+              전세와 월세 중 어떤 선택이 더 유리한지는 단순히 금액만 비교해서는 알 수 없습니다.
+              전세 보증금에 대한 기회비용과 월세 지출을 함께 고려해야 정확한 판단이 가능합니다.
+              이 계산기는 두 가지 비용을 동일한 기준으로 비교할 수 있도록 도와줍니다.
             </p>
+
+            <h2 className="text-xl font-bold text-slate-900">
+              전세와 월세의 차이
+            </h2>
+
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                <tr className="bg-slate-50">
+                  <th className="border border-slate-200 p-3">구분</th>
+                  <th className="border border-slate-200 p-3">전세</th>
+                  <th className="border border-slate-200 p-3">월세</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td className="border border-slate-200 p-3 font-semibold">초기 비용</td>
+                  <td className="border border-slate-200 p-3">보증금 큼</td>
+                  <td className="border border-slate-200 p-3">보증금 적음</td>
+                </tr>
+                <tr>
+                  <td className="border border-slate-200 p-3 font-semibold">월 비용</td>
+                  <td className="border border-slate-200 p-3">이자 형태 비용</td>
+                  <td className="border border-slate-200 p-3">월세 지속 발생</td>
+                </tr>
+                <tr>
+                  <td className="border border-slate-200 p-3 font-semibold">장점</td>
+                  <td className="border border-slate-200 p-3">장기 비용 절감 가능</td>
+                  <td className="border border-slate-200 p-3">현금 유동성 확보</td>
+                </tr>
+                <tr>
+                  <td className="border border-slate-200 p-3 font-semibold">단점</td>
+                  <td className="border border-slate-200 p-3">자금 묶임</td>
+                  <td className="border border-slate-200 p-3">장기 비용 증가</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h2 className="text-xl font-bold text-slate-900">
+              계산 기준 (핵심)
+            </h2>
+
+            <div className="rounded bg-slate-100 p-4">
+              <strong>전세 비용 = 보증금 × 이자율</strong>
+              <br />
+              <strong>월세 비용 = 월세 + (보증금 × 이자율)</strong>
+            </div>
+
             <p>
-              단순히 "전세가 싸다"는 말은 틀릴 수 있습니다. 전세 보증금에 묶인
-              돈의 <strong>기회비용</strong>을 계산해야 합니다.
+              전세는 월세가 없지만 보증금이 묶여 있기 때문에 이자 수익을 포기하게 됩니다.
+              반대로 월세는 매달 현금이 나가지만 보증금이 적어 기회비용이 낮습니다.
             </p>
-            <hr className="border-slate-100" />
-            <p className="text-slate-400">
-              이자율을 현재 정기예금 금리(약 3~4%)로 설정하면 현실적인 비교가
-              가능합니다.
+
+            <h2 className="text-xl font-bold text-slate-900">
+              실제 계산 예시
+            </h2>
+
+            <p>
+              전세 3억 원, 이자율 4%라면 월 기회비용은 약 100만 원입니다.
+              동일한 조건에서 월세가 90만 원이라면 월세가 더 유리할 수 있습니다.
             </p>
+
+            <h2 className="text-xl font-bold text-slate-900">
+              언제 전세가 유리할까?
+            </h2>
+
+            <ul className="list-disc space-y-2 pl-5">
+              <li>금리가 낮을 때</li>
+              <li>보증금을 충분히 마련할 수 있을 때</li>
+              <li>장기 거주 예정일 때</li>
+            </ul>
+
+            <h2 className="text-xl font-bold text-slate-900">
+              언제 월세가 유리할까?
+            </h2>
+
+            <ul className="list-disc space-y-2 pl-5">
+              <li>금리가 높은 상황</li>
+              <li>초기 자금이 부족할 때</li>
+              <li>단기 거주 예정일 때</li>
+            </ul>
+
+            <h2 className="text-xl font-bold text-slate-900">
+              주의사항
+            </h2>
+
+            <ul className="list-disc space-y-2 pl-5">
+              <li>전세보증보험 비용은 별도로 고려해야 합니다.</li>
+              <li>금리 변동에 따라 결과가 달라질 수 있습니다.</li>
+              <li>실제 시장 월세와 비교하여 판단하는 것이 중요합니다.</li>
+              <li>계산 결과는 참고용입니다.</li>
+            </ul>
+
+            <div className="rounded-2xl bg-blue-50 p-5 text-blue-900">
+              <p className="font-bold">선택 팁</p>
+              <p className="mt-2">
+                전세와 월세는 단순 가격 비교가 아니라 금리와 자금 상황에 따라 달라집니다.
+                위 계산기를 통해 실제 비용을 비교한 후 결정하는 것이 가장 정확합니다.
+              </p>
+            </div>
           </>
         }
         examples={EXAMPLES}
