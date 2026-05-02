@@ -85,18 +85,116 @@ export default function PrepaymentCalculatorPage() {
         }
         guide={
           <>
+            <h2 className="text-xl font-bold text-slate-900">
+              중도상환 계산기란?
+            </h2>
+
             <p>
-              중도상환은 대출을 조기 상환해 이자를 줄이는 방법이지만, 수수료가
-              발생하면 실제 이득이 줄어들 수 있습니다.
+              중도상환 계산기는 대출 만기 전에 일부 또는 전액을 미리 갚을 때 발생할 수 있는
+              중도상환수수료와 이자 절감 효과를 비교하는 계산기입니다. 대출을 빨리 갚으면
+              이자는 줄어들 수 있지만, 수수료가 발생하면 실제 이득이 예상보다 작아질 수 있습니다.
             </p>
+
+            <h2 className="text-xl font-bold text-slate-900">
+              중도상환 판단 기준
+            </h2>
+
+            <div className="rounded bg-slate-100 p-4">
+              <strong>실질 이득 = 절약되는 이자 - 중도상환수수료</strong>
+            </div>
+
             <p>
-              따라서 <strong>절약되는 이자 - 수수료</strong>를 기준으로 판단해야
-              합니다.
+              계산 결과 실질 이득이 플러스라면 중도상환이 유리할 가능성이 높고,
+              마이너스라면 수수료 부담 때문에 당장 상환하지 않는 편이 나을 수 있습니다.
             </p>
-            <hr className="border-slate-100" />
-            <p className="text-slate-400">
-              이 계산기는 원리금균등상환 기준의 참고용 계산입니다.
+
+            <h2 className="text-xl font-bold text-slate-900">
+              중도상환수수료 계산 방식
+            </h2>
+
+            <p>
+              중도상환수수료는 보통 중도상환금액, 수수료율, 대출 경과 기간을 기준으로 계산됩니다.
+              금융기관마다 방식은 다르지만 일반적으로 대출 실행 초기일수록 수수료 부담이 크고,
+              시간이 지날수록 줄어드는 구조가 많습니다.
             </p>
+
+            <div className="rounded bg-slate-100 p-4">
+              <strong>수수료 = 중도상환금액 × 수수료율 × 잔여 수수료 기간 비율</strong>
+            </div>
+
+            <h2 className="text-xl font-bold text-slate-900">
+              실제 계산 예시
+            </h2>
+
+            <p>
+              예를 들어 잔여 원금이 2억 원이고 이 중 5천만 원을 중도상환한다고 가정해보겠습니다.
+              중도상환수수료율이 1.2%라면 단순 계산 수수료는 약 60만 원입니다.
+              하지만 중도상환으로 앞으로 줄어드는 이자가 150만 원이라면 실질 이득은 약 90만 원입니다.
+            </p>
+
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                <tr className="bg-slate-50">
+                  <th className="border border-slate-200 p-3">구분</th>
+                  <th className="border border-slate-200 p-3">금액</th>
+                  <th className="border border-slate-200 p-3">의미</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td className="border border-slate-200 p-3">중도상환금액</td>
+                  <td className="border border-slate-200 p-3">5,000만 원</td>
+                  <td className="border border-slate-200 p-3">미리 갚는 금액</td>
+                </tr>
+                <tr>
+                  <td className="border border-slate-200 p-3">예상 수수료</td>
+                  <td className="border border-slate-200 p-3">약 60만 원</td>
+                  <td className="border border-slate-200 p-3">금융기관에 낼 수 있는 비용</td>
+                </tr>
+                <tr>
+                  <td className="border border-slate-200 p-3">절약 이자</td>
+                  <td className="border border-slate-200 p-3">약 150만 원</td>
+                  <td className="border border-slate-200 p-3">상환으로 줄어드는 이자</td>
+                </tr>
+                <tr>
+                  <td className="border border-slate-200 p-3">실질 이득</td>
+                  <td className="border border-slate-200 p-3">약 90만 원</td>
+                  <td className="border border-slate-200 p-3">절약 이자에서 수수료를 뺀 금액</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h2 className="text-xl font-bold text-slate-900">
+              중도상환이 유리한 경우
+            </h2>
+
+            <ul className="list-disc space-y-2 pl-5">
+              <li>절약되는 이자가 중도상환수수료보다 큰 경우</li>
+              <li>대출 금리가 높고 잔여 기간이 많이 남아 있는 경우</li>
+              <li>여유자금이 있고 다른 투자 수익률보다 대출 금리가 높은 경우</li>
+              <li>대출 갈아타기 전에 기존 대출 비용을 비교해야 하는 경우</li>
+            </ul>
+
+            <h2 className="text-xl font-bold text-slate-900">
+              계산 시 주의사항
+            </h2>
+
+            <ul className="list-disc space-y-2 pl-5">
+              <li>실제 중도상환수수료율과 면제 조건은 금융기관 및 상품마다 다릅니다.</li>
+              <li>일부 상품은 일정 기간 이후 중도상환수수료가 면제될 수 있습니다.</li>
+              <li>대출 갈아타기 목적이라면 신규 대출 금리, 인지세, 보증료도 함께 비교해야 합니다.</li>
+              <li>계산 결과는 참고용이며 실제 상환 전 금융기관의 상환 예정 금액을 확인해야 합니다.</li>
+            </ul>
+
+            <div className="rounded-2xl bg-blue-50 p-5 text-blue-900">
+              <p className="font-bold">중도상환 판단 팁</p>
+              <p className="mt-2">
+                중도상환은 “빨리 갚는다”보다 “수수료를 내고도 이자가 더 줄어드는가”가 핵심입니다.
+                위 계산기로 수수료와 절약 이자를 함께 비교한 뒤 결정하는 것이 좋습니다.
+              </p>
+            </div>
           </>
         }
         examples={EXAMPLES}
