@@ -73,7 +73,7 @@ const FAQ = [
   },
 ];
 
-export default function AcquisitionTaxCalculatorPage() {
+export default function Page() {
   const crumbs = [
     { name: "홈", url: BASE_URL },
     { name: "부동산 계산기", url: `${BASE_URL}/real-estate` },
@@ -214,8 +214,8 @@ export default function AcquisitionTaxCalculatorPage() {
             href: "/blog/acquisition-tax-guide",
           },
           {
-            label: "부동산 매매 시 내야 하는 세금 한눈에 정리",
-            href: "/blog/real-estate-tax-summary",
+            label: "양도소득세 완벽 정리 — 매도 시 세금까지 함께",
+            href: "/blog/capital-gains-tax",
           },
         ]}
       />

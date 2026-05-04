@@ -55,7 +55,7 @@ const FAQ = [
   },
 ];
 
-export default function PrepaymentCalculatorPage() {
+export default function Page() {
   return (
     <Suspense>
       <CalcShell
@@ -75,10 +75,10 @@ export default function PrepaymentCalculatorPage() {
                 있습니다.
               </p>
               <a
-                href="/blog/prepayment-fee-timing"
+                href="/blog/loan-interest-calculation"
                 className="block rounded-xl bg-slate-900 py-3 text-center font-bold text-white hover:bg-slate-800"
               >
-                👉 중도상환 타이밍 확인
+                👉 대출 이자 계산 + 절약 5가지 방법
               </a>
             </div>
           </>
@@ -205,8 +205,8 @@ export default function PrepaymentCalculatorPage() {
           { label: "전세대출 계산기",  href: "/jeonse-loan-calculator",   icon: "🏠" },
         ]}
         relatedGuides={[
-          { label: "중도상환 타이밍 완벽 가이드", href: "/blog/prepayment-fee-timing" },
-          { label: "대출 갈아타기 전략",           href: "/blog/loan-refinancing-strategy" },
+          { label: "대출 이자 계산 방법 완벽 정리",         href: "/blog/loan-interest-calculation" },
+          { label: "원리금균등 vs 원금균등 — 같은 대출 다른 총이자", href: "/blog/equal-payment-vs-equal-principal" },
         ]}
       />
     </Suspense>

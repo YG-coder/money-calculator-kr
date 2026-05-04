@@ -62,7 +62,7 @@ const FAQ = [
   },
 ];
 
-export default function AmortizationCalculatorPage() {
+export default function Page() {
   return (
     <Suspense>
       <CalcShell
@@ -243,7 +243,7 @@ export default function AmortizationCalculatorPage() {
         ]}
         relatedGuides={[
           { label: "원리금균등 vs 원금균등 완벽 비교", href: "/blog/equal-payment-vs-equal-principal" },
-          { label: "대출 종류 총정리",                  href: "/blog/loan-types-guide" },
+          { label: "대출 이자 계산 방법 완벽 정리",   href: "/blog/loan-interest-calculation" },
         ]}
       />
     </Suspense>

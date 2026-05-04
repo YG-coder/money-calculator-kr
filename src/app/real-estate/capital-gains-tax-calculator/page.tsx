@@ -205,7 +205,8 @@ export default function CapitalGainsTaxPage() {
                     { label: "재건축 분담금 계산기", href: "/real-estate/reconstruction-contribution-calculator", icon: "🏗️" },
                 ]}
                 relatedGuides={[
-                    { label: "양도세 절세 전략", href: "/blog/capital-gains-tax" },
+                    { label: "양도소득세 완벽 정리 — 세율·비과세·장기보유공제", href: "/blog/capital-gains-tax" },
+                    { label: "취득세 완벽 가이드 — 매수 단계 세금까지 함께",     href: "/blog/acquisition-tax-guide" },
                 ]}
             />
         </Suspense>

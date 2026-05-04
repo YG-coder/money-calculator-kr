@@ -60,7 +60,7 @@ const FAQ = [
   },
 ];
 
-export default function LoanInterestCalculatorPage() {
+export default function Page() {
   return (
     <Suspense>
       <CalcShell
@@ -80,10 +80,10 @@ export default function LoanInterestCalculatorPage() {
                 조건이 최선인지 꼭 비교해보세요.
               </p>
               <a
-                href="/blog/loan-refinancing-strategy"
+                href="/blog/loan-interest-calculation"
                 className="block rounded-xl bg-slate-900 py-3 text-center font-bold text-white hover:bg-slate-800"
               >
-                👉 금리 낮추는 방법 확인
+                👉 대출 이자 계산 방법 완벽 정리
               </a>
             </div>
           </>
@@ -183,8 +183,8 @@ export default function LoanInterestCalculatorPage() {
           { label: "중도상환 계산기",   href: "/prepayment-calculator",    icon: "💸" },
         ]}
         relatedGuides={[
-          { label: "대출 갈아타기 전략 완벽 가이드",     href: "/blog/loan-refinancing-strategy" },
-          { label: "대출 종류 총정리 (주담대·신용·전세)", href: "/blog/loan-types-guide" },
+          { label: "대출 이자 계산 방법 완벽 정리",         href: "/blog/loan-interest-calculation" },
+          { label: "원리금균등 vs 원금균등 — 같은 대출 다른 총이자", href: "/blog/equal-payment-vs-equal-principal" },
         ]}
       />
     </Suspense>

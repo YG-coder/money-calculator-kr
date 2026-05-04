@@ -225,8 +225,12 @@ export default function ReconstructionContributionPage() {
                 ]}
                 relatedGuides={[
                     {
-                        label: "재건축 분담금 계산 방법",
-                        href: "/blog/reconstruction-contribution-guide",
+                        label: "양도소득세 완벽 정리 — 보유기간·비과세·장기보유공제",
+                        href: "/blog/capital-gains-tax",
+                    },
+                    {
+                        label: "취득세 완벽 가이드 — 매수 단계 세금",
+                        href: "/blog/acquisition-tax-guide",
                     },
                 ]}
             />

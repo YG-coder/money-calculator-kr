@@ -75,17 +75,17 @@ export default function Page() {
             <JeonseLoanCalc />
             <div className="mt-6 rounded-2xl border border-yellow-200 bg-yellow-50 p-5">
               <p className="mb-2 text-sm font-bold text-slate-800">
-                ⚠️ 보증기관 선택에 따라 한도 차이 발생
+                ⚠️ 전세 보증금이 정말 유리한지 먼저 확인하세요
               </p>
               <p className="mb-3 text-sm text-slate-600">
-                HUG, HF, SGI 보증에 따라 금리와 대출 가능 금액이 달라질 수
-                있습니다.
+                전세 보증금의 기회비용을 월세와 비교해보면 의외의 결과가 나올 수
+                있습니다. 보증기관(HUG·HF·SGI) 차이도 함께 정리되어 있습니다.
               </p>
               <a
-                href="/blog/jeonse-loan-hug-hf-sgi"
+                href="/blog/jeonse-vs-wolse"
                 className="block rounded-xl bg-slate-900 py-3 text-center font-bold text-white hover:bg-slate-800"
               >
-                👉 전세대출 차이 완벽 정리
+                👉 전세 vs 월세 + 보증기관 가이드
               </a>
             </div>
           </>
@@ -196,8 +196,7 @@ export default function Page() {
           { label: "중도상환 계산기",       href: "/prepayment-calculator",                  icon: "💸" },
         ]}
         relatedGuides={[
-          { label: "전세대출 보증기관(HUG·HF·SGI) 완벽 정리", href: "/blog/jeonse-loan-hug-hf-sgi" },
-          { label: "전세 vs 월세 어떤 게 유리한가",            href: "/blog/jeonse-vs-wolse" },
+          { label: "전세 vs 월세 + 보증기관(HUG·HF·SGI) 가이드", href: "/blog/jeonse-vs-wolse" },
         ]}
       />
     </Suspense>

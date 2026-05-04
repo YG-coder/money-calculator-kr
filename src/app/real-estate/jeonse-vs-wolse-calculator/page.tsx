@@ -69,7 +69,7 @@ const FAQ = [
   },
 ];
 
-export default function JeonseVsWolseCalculatorPage() {
+export default function Page() {
   const crumbs = [
     { name: "홈",                 url: BASE_URL },
     { name: "부동산 계산기",       url: `${BASE_URL}/real-estate` },
@@ -219,8 +219,7 @@ export default function JeonseVsWolseCalculatorPage() {
           },
         ]}
         relatedGuides={[
-          { label: "전세 vs 월세 어떤 게 유리한가",  href: "/blog/jeonse-vs-wolse" },
-          { label: "전세보증보험 완벽 가이드",         href: "/blog/jeonse-insurance-guide" },
+          { label: "전세 vs 월세 + 보증기관·보증보험 가이드", href: "/blog/jeonse-vs-wolse" },
         ]}
       />
     </Suspense>
