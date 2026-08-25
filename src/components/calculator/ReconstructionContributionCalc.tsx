@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useCalcState } from "@/hooks/useCalcState";
+import { readNum, readWon } from "@/lib/calcInput";
 import { formatKRW } from "@/lib/loan";
 import InputField from "@/components/calculator/InputField";
 import ResultCard from "@/components/calculator/ResultCard";
@@ -31,13 +32,13 @@ const FIELDS = [
 ];
 
 export default function ReconstructionContributionCalc() {
-  const { state, setValue, getWon, getNum } = useCalcState(FIELDS);
+  const { state, setValue } = useCalcState(FIELDS);
 
   const result = useMemo(() => {
-    // getWon: 만원 단위 입력 → 원 단위로 변환됨
-    const previous = getWon("previousAsset");
-    const proportionalRatio = getNum("ratio");
-    const future = getWon("futureAsset");
+    // readWon: 만원 단위 입력 → 원 단위로 변환됨
+    const previous = readWon(state, "previousAsset");
+    const proportionalRatio = readNum(state, "ratio");
+    const future = readWon(state, "futureAsset");
 
     if (!previous || !future || proportionalRatio < 0) return null;
 
@@ -50,7 +51,7 @@ export default function ReconstructionContributionCalc() {
       contribution,
       refund,
     };
-  }, [state, getWon, getNum]);
+  }, [state]);
 
   return (
     <div className="space-y-5">
@@ -104,7 +105,7 @@ export default function ReconstructionContributionCalc() {
             />
             <ResultCard
               label="종후자산가액"
-              value={formatKRW(getWon("futureAsset"))}
+              value={formatKRW(readWon(state, "futureAsset"))}
               sub="재건축 후 받을 자산"
             />
           </div>
@@ -115,11 +116,11 @@ export default function ReconstructionContributionCalc() {
               <div className="flex items-center justify-between">
                 <span>종전자산평가액</span>
                 <span className="font-semibold tabular-nums text-slate-800">
-                  {formatKRW(getWon("previousAsset"))}
+                  {formatKRW(readWon(state, "previousAsset"))}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span>× 비례율 ({getNum("ratio")}%)</span>
+                <span>× 비례율 ({readNum(state, "ratio")}%)</span>
                 <span className="font-semibold tabular-nums text-slate-800">
                   {formatKRW(result.rightValue)}
                 </span>
@@ -127,7 +128,7 @@ export default function ReconstructionContributionCalc() {
               <div className="flex items-center justify-between">
                 <span>종후자산가액</span>
                 <span className="font-semibold tabular-nums text-slate-800">
-                  {formatKRW(getWon("futureAsset"))}
+                  {formatKRW(readWon(state, "futureAsset"))}
                 </span>
               </div>
               <div className="border-t border-slate-200 pt-2 flex items-center justify-between font-bold text-slate-900">

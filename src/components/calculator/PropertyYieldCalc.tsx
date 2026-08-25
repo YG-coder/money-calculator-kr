@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useCalcState } from "@/hooks/useCalcState";
+import { readNum } from "@/lib/calcInput";
 import { formatKRW, formatUnit } from "@/lib/loan";
 import { calcPropertyYield } from "@/lib/realEstate";
 import InputField from "@/components/calculator/InputField";
@@ -52,19 +53,19 @@ function formatPercent(value: number) {
 }
 
 export default function PropertyYieldCalc() {
-  const { state, setValue, getNum } = useCalcState(FIELDS);
+  const { state, setValue } = useCalcState(FIELDS);
 
   const result = useMemo(() => {
-    const price = getNum("purchasePrice");
-    const dep   = getNum("deposit");
-    const rent  = getNum("monthlyRent");
-    const loan  = getNum("loanAmount");
-    const rate  = getNum("loanRate");
-    const cost  = getNum("monthlyCost");
+    const price = readNum(state, "purchasePrice");
+    const dep   = readNum(state, "deposit");
+    const rent  = readNum(state, "monthlyRent");
+    const loan  = readNum(state, "loanAmount");
+    const rate  = readNum(state, "loanRate");
+    const cost  = readNum(state, "monthlyCost");
 
     if (!price || !rent) return null;
     return calcPropertyYield(price, dep, rent, loan, rate, cost);
-  }, [state, getNum]);
+  }, [state]);
 
   const isProfit = result ? result.monthlyNetIncome > 0 : false;
 

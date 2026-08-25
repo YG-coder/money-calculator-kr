@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useCalcState } from "@/hooks/useCalcState";
+import { readNum } from "@/lib/calcInput";
 import { formatKRW, formatUnit } from "@/lib/loan";
 import { calcAcquisitionTax, type OwnershipType } from "@/lib/realEstate";
 import InputField from "@/components/calculator/InputField";
@@ -18,17 +19,17 @@ const FIELDS = [
 ];
 
 export default function AcquisitionTaxCalc() {
-  const { state, setValue, getNum } = useCalcState(FIELDS);
+  const { state, setValue } = useCalcState(FIELDS);
 
   const [ownership, setOwnership] = useState<OwnershipType>("first");
   const [isAdjusted, setIsAdjusted] = useState(false);
   const [isOver85, setIsOver85] = useState(false);
 
   const result = useMemo(() => {
-    const priceMan = getNum("price");
+    const priceMan = readNum(state, "price");
     if (!priceMan || priceMan <= 0) return null;
     return calcAcquisitionTax(priceMan, ownership, isAdjusted, isOver85);
-  }, [state, getNum, ownership, isAdjusted, isOver85]);
+  }, [state, ownership, isAdjusted, isOver85]);
 
   const ownershipOptions: { value: OwnershipType; label: string }[] = [
     { value: "first",       label: "1주택 (무주택 → 첫 취득)" },
@@ -150,7 +151,7 @@ export default function AcquisitionTaxCalc() {
             <ResultCard
               label="총 납부 세금"
               value={formatKRW(result.totalTax)}
-              sub={`취득가액의 ${((result.totalTax / (getNum("price") * 10_000)) * 100).toFixed(2)}%`}
+              sub={`취득가액의 ${((result.totalTax / (readNum(state, "price") * 10_000)) * 100).toFixed(2)}%`}
               highlight
             />
             <ResultCard

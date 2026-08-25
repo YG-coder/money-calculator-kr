@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useCalcState } from "@/hooks/useCalcState";
+import { readNum, readWon } from "@/lib/calcInput";
 import { calcJeonseLoan, formatKRW, formatUnit } from "@/lib/loan";
 import InputField from "./InputField";
 import ResultCard from "./ResultCard";
@@ -66,20 +67,20 @@ const EXAMPLES = [
 ];
 
 export default function JeonseLoanCalc() {
-  const { state, setValue, getWon, getNum } = useCalcState(FIELDS);
+  const { state, setValue } = useCalcState(FIELDS);
 
   const result = useMemo(() => {
-    const d = getWon("deposit");
-    const r = getNum("rate");
-    const m = getNum("months");
+    const d = readWon(state, "deposit");
+    const r = readNum(state, "rate");
+    const m = readNum(state, "months");
 
     if (!d || !r || !m) return null;
 
-    const income = getWon("income");
-    const ltv = getNum("ltv") || 80;
+    const income = readWon(state, "income");
+    const ltv = readNum(state, "ltv") || 80;
 
     return calcJeonseLoan(d, r, m, income, ltv);
-  }, [state, getWon, getNum]);
+  }, [state]);
 
   function applyExample(ex: (typeof EXAMPLES)[0]) {
     setValue("deposit", ex.deposit);

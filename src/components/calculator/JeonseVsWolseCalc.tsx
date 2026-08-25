@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useCalcState } from "@/hooks/useCalcState";
+import { readNum } from "@/lib/calcInput";
 import { formatKRW, formatUnit } from "@/lib/loan";
 import { calcJeonseVsWolse } from "@/lib/realEstate";
 import InputField from "@/components/calculator/InputField";
@@ -42,17 +43,17 @@ const FIELDS = [
 ];
 
 export default function JeonseVsWolseCalc() {
-  const { state, setValue, getNum } = useCalcState(FIELDS);
+  const { state, setValue } = useCalcState(FIELDS);
 
   const result = useMemo(() => {
-    const jd = getNum("jeonseDeposit");
-    const wd = getNum("wolseDeposit");
-    const wm = getNum("wolseMonthly");
-    const ir = getNum("investRate");
+    const jd = readNum(state, "jeonseDeposit");
+    const wd = readNum(state, "wolseDeposit");
+    const wm = readNum(state, "wolseMonthly");
+    const ir = readNum(state, "investRate");
 
     if (!jd || !wm || !ir) return null;
     return calcJeonseVsWolse(jd, wd, wm, ir);
-  }, [state, getNum]);
+  }, [state]);
 
   return (
     <div className="space-y-5">

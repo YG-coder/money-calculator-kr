@@ -10,12 +10,27 @@
  * - decimal: 소수 입력용
  * - URL searchParams 동기화
  * - 빠른 연속 입력에도 stale state 방지
+ *
+ * ⚠️ 값 읽기 주의
+ *   getWon()/getNum() 은 useEffect 로 갱신되는 latestStateRef 를 읽는다. 디바운스된
+ *   URL 쓰기(350ms 뒤)에는 적합하지만, 렌더 중 실행되는 useMemo 안에서는 한 박자 늦은
+ *   값이 잡힌다. 계산 결과를 만들 때는 @/lib/calcInput 의 readNum/readWon/isFilled 를
+ *   쓸 것. (하위호환을 위해 getWon/getNum 은 그대로 남겨둔다.)
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import {
+  sanitize,
+  toDisplay,
+  type CalcState,
+  type FieldKind,
+  type FieldState,
+} from "@/lib/calcInput";
 
-export type FieldKind = "money" | "integer" | "decimal";
+// 기존 사용처 호환을 위한 re-export (파싱·읽기 유틸의 정본은 @/lib/calcInput)
+export type { CalcState, FieldKind, FieldState };
+export { readRaw, readNum, readWon, isFilled } from "@/lib/calcInput";
 
 export type FieldDef = {
   key: string;
@@ -24,67 +39,8 @@ export type FieldDef = {
   validate?: (v: string) => string | undefined;
 };
 
-export type FieldState = {
-  value: string;
-  raw: string;
-  error: string;
-};
-
-export type CalcState = Record<string, FieldState>;
-
 function getKind(field: FieldDef): FieldKind {
   return field.kind ?? "decimal";
-}
-
-function sanitize(input: string, kind: FieldKind): string {
-  const value = input.replace(/,/g, "").trim();
-
-  if (!value) return "";
-
-  if (kind === "money" || kind === "integer") {
-    return value.replace(/[^\d]/g, "");
-  }
-
-  const cleaned = value.replace(/[^\d.]/g, "");
-  const parts = cleaned.split(".");
-
-  if (parts.length <= 1) return cleaned;
-
-  return `${parts[0]}.${parts.slice(1).join("")}`;
-}
-
-function toDisplay(raw: string, kind: FieldKind): string {
-  if (!raw) return "";
-
-  if (kind === "money" || kind === "integer") {
-    if (isNaN(Number(raw))) return raw;
-    return Number(raw).toLocaleString("ko-KR");
-  }
-
-  if (/\.$/.test(raw) || /\.\d*0$/.test(raw)) {
-    const [intPart, decPart = ""] = raw.split(".");
-    const formattedInt =
-      intPart === "" || isNaN(Number(intPart))
-        ? intPart
-        : Number(intPart).toLocaleString("ko-KR");
-
-    return raw.endsWith(".")
-      ? `${formattedInt}.`
-      : `${formattedInt}.${decPart}`;
-  }
-
-  if (raw.includes(".")) {
-    const [intPart, decPart = ""] = raw.split(".");
-    const formattedInt =
-      intPart === "" || isNaN(Number(intPart))
-        ? intPart
-        : Number(intPart).toLocaleString("ko-KR");
-
-    return `${formattedInt}.${decPart}`;
-  }
-
-  if (isNaN(Number(raw))) return raw;
-  return Number(raw).toLocaleString("ko-KR");
 }
 
 export function useCalcState(fields: FieldDef[]) {
@@ -203,11 +159,13 @@ export function useCalcState(fields: FieldDef[]) {
     [fields, scheduleUrlUpdate],
   );
 
+  /** @deprecated 렌더 중(useMemo)에는 한 박자 늦다. @/lib/calcInput 의 readWon 을 쓸 것. */
   const getWon = useCallback((key: string): number => {
     const n = Number(latestStateRef.current[key]?.raw ?? "0");
     return isNaN(n) ? 0 : n * 10_000;
   }, []);
 
+  /** @deprecated 렌더 중(useMemo)에는 한 박자 늦다. @/lib/calcInput 의 readNum 을 쓸 것. */
   const getNum = useCallback((key: string): number => {
     const n = Number(latestStateRef.current[key]?.raw ?? "0");
     return isNaN(n) ? 0 : n;
