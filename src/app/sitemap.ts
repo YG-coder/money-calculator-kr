@@ -34,6 +34,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       freq: "monthly",
     },
     {
+      path: "real-estate/initial-cost-calculator",
+      priority: 0.9,
+      freq: "monthly",
+    },
+    {
       path: "real-estate/jeonse-vs-wolse-calculator",
       priority: 0.9,
       freq: "monthly",

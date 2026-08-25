@@ -17,6 +17,7 @@ export { default as RateSimulatorCalc }   from "./RateSimulatorCalc";
 export { default as FixedVariableCalc }   from "./FixedVariableCalc";
 // ── 신규: 부동산 계산기 ──
 export { default as AcquisitionTaxCalc }  from "./AcquisitionTaxCalc";
+export { default as InitialCostCalc }     from "./InitialCostCalc";
 export { default as JeonseVsWolseCalc }   from "./JeonseVsWolseCalc";
 export { default as RelatedLinks }        from "./RelatedLinks";
 export { default as SavingsCompareCalc }  from "./SavingsCompareCalc";

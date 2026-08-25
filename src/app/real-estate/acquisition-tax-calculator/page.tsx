@@ -187,6 +187,7 @@ export default function Page() {
             examples={EXAMPLES}
             faq={FAQ}
             relatedCalcs={[
+          { label: "실투자금 계산기 (총 필요자금)", href: "/real-estate/initial-cost-calculator", icon: "💰" },
               {
                 label: "월세 vs 전세 계산기",
                 href: "/real-estate/jeonse-vs-wolse-calculator",

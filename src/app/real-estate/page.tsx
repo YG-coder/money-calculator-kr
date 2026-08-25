@@ -26,6 +26,12 @@ const CALCS = [
     icon: "🏠",
   },
   {
+    title: "부동산 실투자금 계산기",
+    desc: "매매가에 취득세·중개보수·등기비용을 더해 실제로 필요한 현금과 실투자금을 계산합니다.",
+    href: "/real-estate/initial-cost-calculator",
+    icon: "💰",
+  },
+  {
     title: "월세 vs 전세 계산기",
     desc: "전세 보증금의 기회비용과 월세 총 비용을 비교해 어떤 선택이 유리한지 계산합니다.",
     href: "/real-estate/jeonse-vs-wolse-calculator",
