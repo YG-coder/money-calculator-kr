@@ -587,13 +587,30 @@ LTV 계산기            "얼마 빌릴 수 있나"      → 대출금
 
 검증: `vitest run` 34/34 · `tsc --noEmit` 0 · `eslint .` 에러 0(경고 7→2) · `next build` 44 페이지 · 실브라우저 before/after 스모크
 
-### PR 1 — `feat(loan): LTV 계산기 추가`
+### ✅ PR 1 — `feat(loan): LTV 계산기 추가` (완료 2026-08-25)
 
-- [ ] `src/lib/policy/ltv.ts` — 정책 테이블 + `verifiedAt` + `source` + 미지원 조합 명시
-- [ ] `src/lib/ltv.ts` — `calcLtv()` 순수 함수 (정책 조회와 계산 분리)
-- [ ] `src/components/calculator/LtvCalc.tsx`
-- [ ] `src/app/ltv-calculator/page.tsx` — 메타데이터·crumbs·EXAMPLES 2건·FAQ 3건·guide
-- [ ] 등록 6곳: `components/calculator/index.ts` · `Header.tsx` NAV_GROUPS(대출) · `/loan` 허브 CALCS · `sitemap.ts` · `Footer.tsx` · `/dsr-calculator` relatedCalcs
+- [x] `src/lib/policy/ltv.ts` — LTV 9조합 표 + 절대한도 + 방공제 참고금액, `PolicyMeta` 3종
+- [x] `src/lib/ltv.ts` — `calcLtv()` 순수 함수. 산식 B (`max(0, min(LTV한도 − 선순위 − 방공제, 절대한도))`)
+- [x] `src/lib/ltv.test.ts` — 18개. A/B 판별 2건 + 동일 2건 + 클램프 + 구간 경계 + 게이팅
+- [x] `src/components/calculator/PolicyNote.tsx` — 기준일·출처·제외 범위 고지 (PR 0에서 이월)
+- [x] `src/components/calculator/LtvCalc.tsx` — 방공제 3상태 명시 선택
+- [x] `src/app/ltv-calculator/page.tsx` — 메타데이터·예시 2건·FAQ 4건·가이드
+- [x] 등록 8곳: `index.ts` · Header · `/loan` 허브 · `sitemap.ts` · Footer · `/dsr-calculator` relatedCalcs + 본문 링크
+- [x] `relatedGuides` 는 공개 확인된 글만 (`/blog/loan-interest-calculation`)
+
+검증: `vitest run` 52/52 · `tsc --noEmit` 0 · `eslint .` 에러 0(경고 2, 기준선 동일) ·
+`next build` **45 페이지**(44 → +1) · 실브라우저 스모크 17항목 통과
+
+**정책 근거**: `LTV-POLICY-2026-08.md` (rev.4). 산식 B는 은행업감독업무시행세칙 [별표 18]과
+금융위 대출한도 규정을 연립해 도출한 확정 산식입니다.
+
+**설계 결정 (D1~D4)**
+- D1 지역 축 3분법, `LtvRegion` 별도 타입 — `lib/dsr.ts` 의 `Region` 재사용 안 함
+- D2 규제지역 여부는 사용자 선택. 목록은 기준일(2026-07-01) 붙인 참고 안내
+- D3 방공제는 **금액 직접 입력**. 조용히 0원을 기본값으로 두지 않고, `직접 입력` 또는
+  `공제하지 않음` 중 하나를 명시적으로 고르기 전에는 계산하지 않음. 0원은 `공제하지 않음`을
+  고른 경우에만 허용. 지역별 법정 금액은 입력 보조 버튼으로만 제공
+- D4 DSR 은 링크만. 쿼리 인계는 PR 5
 
 ### PR 2 — `feat(realestate): 부동산 실투자금 계산기 추가`
 
@@ -975,45 +992,45 @@ A(사용자 직접 입력) / B(빌드타임 fetch + ISR) / C(클라이언트 fet
 
 **정책·정확성**
 
-- [ ] `src/lib/policy/ltv.ts`에 정책 테이블이 있고, `PolicyMeta`의 `verifiedAt` · `source`가 **실제로 원문을 확인한 날짜와 문서명**으로 채워져 있다
-- [ ] 적용 LTV가 상수가 아니라 **(지역 × 주택수 × 생애최초 × 가격구간) 조회 함수**로 구현되어 있다
-- [ ] 정책 테이블에 없는 조건 조합에서 **임의 보간하지 않고** "지원하지 않음"을 반환한다
-- [ ] `src/lib/ltv.ts`의 계산 함수가 순수 함수이며 정책 모듈만 참조한다 (React·DOM 의존 0)
+- [x] `src/lib/policy/ltv.ts`에 정책 테이블이 있고, `PolicyMeta`의 `verifiedAt` · `source`가 **실제로 원문을 확인한 날짜와 문서명**으로 채워져 있다
+- [x] 적용 LTV가 상수가 아니라 **(지역 × 주택수 × 생애최초 × 가격구간) 조회 함수**로 구현되어 있다
+- [x] 정책 테이블에 없는 조건 조합에서 **임의 보간하지 않고** "지원하지 않음"을 반환한다
+- [x] `src/lib/ltv.ts`의 계산 함수가 순수 함수이며 정책 모듈만 참조한다 (React·DOM 의존 0)
 
 **계산 정확성**
 
-- [ ] 9.4절 LTV 경계값 4종이 손 검산과 일치한다 (검산 과정을 PR 설명에 기록)
-- [ ] 방공제+선순위가 담보인정액을 넘을 때 음수가 아니라 `0`이 나온다
-- [ ] EXAMPLES 2건의 수치가 실제 계산기 출력과 일치한다
+- [x] 9.4절 LTV 경계값 4종이 손 검산과 일치한다 (검산 과정을 PR 설명에 기록)
+- [x] 방공제+선순위가 담보인정액을 넘을 때 음수가 아니라 `0`이 나온다
+- [x] EXAMPLES 2건의 수치가 실제 계산기 출력과 일치한다
 
 **표현**
 
-- [ ] 결과 문구가 "예상/참고/추정"이며 "대출 가능액 확정" 류 표현이 없다
-- [ ] `PolicyNote`로 기준일·출처가 화면에 표시된다
-- [ ] "실제 한도는 DSR·소득 인정방식·금융회사 심사에 따라 낮아질 수 있음" 고지가 있다
-- [ ] 법률·금융 판단을 대신한다는 표현이 없다
+- [x] 결과 문구가 "예상/참고/추정"이며 "대출 가능액 확정" 류 표현이 없다
+- [x] `PolicyNote`로 기준일·출처가 화면에 표시된다
+- [x] "실제 한도는 DSR·소득 인정방식·금융회사 심사에 따라 낮아질 수 있음" 고지가 있다
+- [x] 법률·금융 판단을 대신한다는 표현이 없다
 
 **통합**
 
-- [ ] `useMemo` 안에서 `getWon/getNum`이 아니라 `readWon/readRaw`를 사용한다 (3.7절 함정)
-- [ ] 등록 6곳 + Footer + `/dsr-calculator` 역링크가 모두 반영되었다
-- [ ] `relatedGuides`가 **공개 상태인 글만** 참조한다 (없으면 빈 배열)
-- [ ] `sitemap.ts`에 `ltv-calculator`가 `priority 0.9 / monthly`로 등록되었다
+- [x] `useMemo` 안에서 `getWon/getNum`이 아니라 `readWon/readRaw`를 사용한다 (3.7절 함정)
+- [x] 등록 6곳 + Footer + `/dsr-calculator` 역링크가 모두 반영되었다
+- [x] `relatedGuides`가 **공개 상태인 글만** 참조한다 (없으면 빈 배열)
+- [x] `sitemap.ts`에 `ltv-calculator`가 `priority 0.9 / monthly`로 등록되었다
 
 **검증**
 
-- [ ] `tsc --noEmit` 에러 0
-- [ ] `eslint .` 에러 0
-- [ ] `next build` 성공 + **정적 페이지 수가 직전 대비 1 증가**
-- [ ] 브라우저 스모크 5종 통과
+- [x] `tsc --noEmit` 에러 0
+- [x] `eslint .` 에러 0
+- [x] `next build` 성공 + **정적 페이지 수가 직전 대비 1 증가**
+- [x] 브라우저 스모크 5종 통과
   - 초기 렌더 / 마지막 입력 즉시 반영 / URL 파라미터 직접 진입 시 값 복원 / 뒤로·앞으로 상태 복원 / 모바일에서 표 가로 스크롤
-- [ ] 콘솔 에러 0
+- [x] 콘솔 에러 0
 
 **문서**
 
-- [ ] 커밋 메시지가 `feat(loan): LTV 계산기 추가` 형식이다
-- [ ] `PLAN.md` · `claude/UPGRADE-2026-08.md`가 **변경되지 않았다**
-- [ ] 이 문서(7절)의 PR 1 체크박스가 갱신되었다
+- [x] 커밋 메시지가 `feat(loan): LTV 계산기 추가` 형식이다
+- [x] `PLAN.md` · `claude/UPGRADE-2026-08.md`가 **변경되지 않았다**
+- [x] 이 문서(7절)의 PR 1 체크박스가 갱신되었다
 
 ---
 
