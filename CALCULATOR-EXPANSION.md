@@ -612,9 +612,28 @@ LTV 계산기            "얼마 빌릴 수 있나"      → 대출금
   고른 경우에만 허용. 지역별 법정 금액은 입력 보조 버튼으로만 제공
 - D4 DSR 은 링크만. 쿼리 인계는 PR 5
 
+### PR 2a — `fix(realestate): 취득세 중과 배제·생애최초 감면 반영`  ※ PR 2 선행
+
+PR 2 가 `calcAcquisitionTax` 를 재사용하므로 먼저 진행합니다. 2026-08-25 재검증에서
+**세율은 전부 일치하나 적용 대상 판정 3건이 누락**된 것이 확인되었습니다.
+
+- [x] A 지방 저가주택 중과 배제 (비수도권 시가표준액 2억 이하, 정비구역 제외)
+- [x] B 생애최초 취득세 감면 (200만원/300만원 명시 선택, 12억 이하)
+- [x] C 일시적 2주택 특례 (3년 내 법정 처분 요건)
+- [x] `lib/policy/acquisitionTax.ts` 신설 + 엔진 객체 인자 전환
+- [x] `AcquisitionTaxCalc` 조건부 입력 UI
+- [x] **회귀 테스트 — A·B·C 미해당 입력에서 기존 값 불변**
+
+**완료 2026-08-25**: 1차 체크리스트를 현행 원문으로 해소하고 11개 회귀·정책 테스트를
+추가했습니다. 생애최초 85㎡ 초과는 감면분 농어촌특별세의 세목 결합을 과대·과소 추정하지
+않도록 v1에서 자동 감면하지 않고 안내합니다.
+
 ### PR 2 — `feat(realestate): 부동산 실투자금 계산기 추가`
 
-- [ ] `src/lib/policy/brokerage.ts` — 중개보수 상한요율표 + `verifiedAt`
+- [ ] `src/lib/policy/brokerage.ts` — 중개보수 상한요율표 (`basis: nationalCeiling`)
+      · 부가세 일반과세 10% 기본 포함 + 제외 토글, 라벨 "일반과세 중개사 기준 예상 최대"
+      · 시·도 폴백 구조 만들지 않음. 서울·경기만 조례 일치 확인 표시
+      · 근거: `BROKERAGE-POLICY-2026-08.md`
 - [ ] `src/lib/realEstate.ts`에 `calcInitialCost()` 추가 (`calcAcquisitionTax` 재사용)
 - [ ] `src/components/calculator/InitialCostCalc.tsx`
 - [ ] `src/app/real-estate/initial-cost-calculator/page.tsx`
@@ -822,7 +841,7 @@ isFilled(state, key): boolean  // 0 은 "입력됨"으로 본다 (금리 0%·수
 |---|---|---|---|
 | 스트레스 DSR (지방 유예) | `lib/dsr.ts` | 2026-08-08 | 유예 종료 2026-12-31 |
 | 전월세 전환율 법정 상한 | `lib/realEstate.ts` | 2026-08-15 | **금통위 2026-08-27 — 임박** |
-| 주택 취득세 | `lib/realEstate.ts` | 2026-08-02 | 지방세법 개정 |
+| 주택 취득세 | `lib/realEstate.ts` | 2026-08-25 | 지방세법·지방세특례제한법 개정 |
 | LTV·방공제 | `lib/policy/ltv.ts` (예정) | 미착수 | 가계부채 관리방안, 국토부 고시 |
 
 ### 9.3 테스트
