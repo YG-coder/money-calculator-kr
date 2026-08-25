@@ -24,7 +24,14 @@ export interface PolicySource {
   name: string;
   /** 원문 URL (있으면) */
   url?: string;
-  /** 원문 발표일 (YYYY-MM-DD) */
+  /**
+   * 원문 발표일 (YYYY-MM-DD).
+   *
+   * ⚠️ 기재 규칙
+   *   원문에서 직접 확인한 발표일만 기록한다.
+   *   기사 작성일·검색 결과 추정일·인접 문서 날짜는 사용하지 않는다.
+   *   확인하지 못하면 필드를 생략한다.
+   */
   publishedAt?: string;
 }
 
