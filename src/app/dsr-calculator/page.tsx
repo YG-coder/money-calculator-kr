@@ -62,7 +62,15 @@ const FAQ = [
   },
   {
     q: "신용대출도 DSR에 포함되나요?",
-    a: "네, 신용대출도 DSR 산정에 포함됩니다. 다만 신용대출은 실제 약정 만기와 무관하게 일괄 5년 만기로 원리금을 산정하고, 총잔액(기존+신규)이 1억원을 초과할 때만 스트레스 금리가 적용되는 등 주택담보대출과 산정 규칙이 다릅니다. 이 계산기는 주택담보대출을 기준으로 하며, 기존 신용대출이 있다면 그 DSR 산정용 연간 원리금을 '기존 대출 연간 원리금' 항목에 입력해 함께 반영할 수 있습니다.",
+    a: "네, 신용대출도 DSR 산정에 포함되며 주택담보대출과 산정 규칙이 다릅니다. 총잔액(기존+신규)이 1억원을 초과할 때만 스트레스 금리가 적용되고, 적용 비율도 고정금리 기간에 따라 달라집니다(만기 5년 이상 고정은 미적용, 3년 이상 5년 미만 고정은 60%, 그 밖은 100%). 원리금은 일시상환·마이너스통장의 경우 5년 만기를 기준으로 산정하지만, 요건을 갖춘 분할상환 신용대출은 실제 만기를 인정받을 수 있어 모든 신용대출이 5년으로 계산되는 것은 아닙니다. 이 계산기는 주택담보대출을 기준으로 하며, 기존 신용대출이 있다면 그 DSR 산정용 연간 원리금을 '기존 대출 연간 원리금' 항목에 입력해 함께 반영할 수 있습니다.",
+  },
+  {
+    q: "전세자금대출도 DSR에 포함되나요?",
+    a: "조건에 따라 다릅니다. 무주택자가 받는 전세자금대출은 원칙적으로 DSR 산정에서 제외됩니다. 1주택자가 수도권·규제지역에서 임차인으로 받는 전세대출은 이자상환분만 DSR에 반영됩니다. 기존 전세대출의 단순 만기연장은 신규 적용 대상이 아니지만, 만기연장 시 증액하는 부분은 신규 대출로 보아 적용됩니다. 그 밖의 조건은 이 계산기가 자동으로 판정하지 않으므로 금융회사에 확인하세요.",
+  },
+  {
+    q: "마이너스통장은 얼마로 잡히나요?",
+    a: "마이너스통장은 실제 사용한 금액이 아니라 약정한도 전액을 대출금액으로 보는 것이 일반적인 DSR 산정 기준입니다. 지금 사용액이 0원이어도 한도가 열려 있으면 DSR에 영향을 줄 수 있습니다. 한도를 줄이거나 해지하면 DSR 부담이 낮아질 수 있으므로, 대출을 앞두고 있다면 금융회사에 확인해 보세요.",
   },
 ];
 
@@ -99,13 +107,14 @@ export default function Page() {
             <h2 className="text-xl font-bold text-slate-900">DSR이란?</h2>
             <p>
               DSR(총부채원리금상환비율)은 연소득 대비 DSR 적용 대상 가계대출의
-              연간 원리금 상환부담을 합산해 계산한 비율입니다. 주택담보대출·신용대출
-              등이 포함되며, 대출 종류에 따라 DSR 적용 여부와 연간 원리금 산정
-              방식이 다를 수 있습니다. 현재 차주 단위 규제 한도는 은행권 40%,
-              비은행권 50%입니다.
+              연간 원리금 상환부담을 합산해 계산한 비율입니다.
+              주택담보대출·신용대출 등이 포함되며, 대출 종류에 따라 DSR 적용
+              여부와 연간 원리금 산정 방식이 다를 수 있습니다. 현재 차주 단위
+              규제 한도는 은행권 40%, 비은행권 50%입니다.
             </p>
             <p>
-              이 계산기는 신규 주택담보대출을 기준으로 스트레스 DSR을 계산합니다.
+              이 계산기는 신규 주택담보대출을 기준으로 스트레스 DSR을
+              계산합니다.
             </p>
 
             <h2 className="text-xl font-bold text-slate-900">
@@ -122,11 +131,15 @@ export default function Page() {
               <table className="w-full border-collapse text-sm">
                 <thead>
                   <tr className="bg-slate-50">
-                    <th className="border border-slate-200 p-3 text-left">구분</th>
+                    <th className="border border-slate-200 p-3 text-left">
+                      구분
+                    </th>
                     <th className="border border-slate-200 p-3 text-left">
                       변동형 스트레스 금리
                     </th>
-                    <th className="border border-slate-200 p-3 text-left">비고</th>
+                    <th className="border border-slate-200 p-3 text-left">
+                      비고
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -164,29 +177,33 @@ export default function Page() {
               지원합니다.
             </p>
 
-            <h2 className="text-xl font-bold text-slate-900">두 가지 계산 모드</h2>
+            <h2 className="text-xl font-bold text-slate-900">
+              두 가지 계산 모드
+            </h2>
             <p>
               <strong>DSR 확인</strong> 모드는 신규 대출 조건을 입력하면 일반
               DSR과 스트레스 DSR을 함께 보여주고, 선택한 기준까지 남은 상환여력
               또는 초과분을 알려줍니다. <strong>추정 가능액</strong> 모드는
               소득과 목표 DSR로 DSR 기준 추정 가능 대출액을 역산합니다. 이때
-              역산도 스트레스 금리 기준으로 계산하므로, 명목 금리로 계산한 값보다
-              보수적으로 나옵니다.
+              역산도 스트레스 금리 기준으로 계산하므로, 명목 금리로 계산한
+              값보다 보수적으로 나옵니다.
             </p>
 
-            <h2 className="text-xl font-bold text-slate-900">계산 시 주의사항</h2>
+            <h2 className="text-xl font-bold text-slate-900">
+              계산 시 주의사항
+            </h2>
             <ul className="list-disc space-y-2 pl-5">
               <li>
                 기존 부채는 DSR 산정용 연간 원리금을 직접 입력합니다. 금융회사
                 앱·상담자료에서 확인한 값이 가장 정확합니다.
               </li>
               <li>
-                DSR 분자(연간 원리금)는 실제 상환액과 다를 수 있으며, 대출종류·상환방식에
-                따라 산정방식이 달라집니다.
+                DSR 분자(연간 원리금)는 실제 상환액과 다를 수 있으며,
+                대출종류·상환방식에 따라 산정방식이 달라집니다.
               </li>
               <li>
-                추정 가능액은 DSR 상한 추정치이며, LTV·방공제·금융회사 심사에 따라
-                실제 한도는 더 낮아질 수 있습니다.
+                추정 가능액은 DSR 상한 추정치이며, LTV·방공제·금융회사 심사에
+                따라 실제 한도는 더 낮아질 수 있습니다.
               </li>
               <li>
                 스트레스 DSR 기준은 정책에 따라 바뀌므로 실제 신청 시점의
@@ -198,8 +215,8 @@ export default function Page() {
               <p className="font-bold">DSR과 함께 확인하면 좋은 것</p>
               <p className="mt-2">
                 DSR로 소득 대비 한도를 확인했다면, 실제 월 상환액과 상환 방식은{" "}
-                원리금상환 계산기에서, 담보 기준 한도는 LTV 계산기에서 함께 검토하세요.
-                실제 한도는 두 값 중 낮은 쪽입니다.
+                원리금상환 계산기에서, 담보 기준 한도는 LTV 계산기에서 함께
+                검토하세요. 실제 한도는 두 값 중 낮은 쪽입니다.
               </p>
             </div>
           </>
@@ -207,15 +224,41 @@ export default function Page() {
         examples={EXAMPLES}
         faq={FAQ}
         relatedCalcs={[
-          { label: "LTV 계산기 (담보 기준 한도)", href: "/ltv-calculator", icon: "📏" },
-          { label: "대출이자 계산기", href: "/loan-interest-calculator", icon: "🏦" },
-          { label: "원리금상환 계산기", href: "/amortization-calculator", icon: "📊" },
-          { label: "전세대출 계산기", href: "/jeonse-loan-calculator", icon: "🏠" },
-          { label: "중도상환 계산기", href: "/prepayment-calculator", icon: "💸" },
+          {
+            label: "LTV 계산기 (담보 기준 한도)",
+            href: "/ltv-calculator",
+            icon: "📏",
+          },
+          {
+            label: "대출이자 계산기",
+            href: "/loan-interest-calculator",
+            icon: "🏦",
+          },
+          {
+            label: "원리금상환 계산기",
+            href: "/amortization-calculator",
+            icon: "📊",
+          },
+          {
+            label: "전세대출 계산기",
+            href: "/jeonse-loan-calculator",
+            icon: "🏠",
+          },
+          {
+            label: "중도상환 계산기",
+            href: "/prepayment-calculator",
+            icon: "💸",
+          },
         ]}
         relatedGuides={[
-          { label: "대출 이자 계산 방법 완벽 정리", href: "/blog/loan-interest-calculation" },
-          { label: "원리금균등 vs 원금균등 완벽 비교", href: "/blog/equal-payment-vs-equal-principal" },
+          {
+            label: "대출 이자 계산 방법 완벽 정리",
+            href: "/blog/loan-interest-calculation",
+          },
+          {
+            label: "원리금균등 vs 원금균등 완벽 비교",
+            href: "/blog/equal-payment-vs-equal-principal",
+          },
         ]}
       />
     </Suspense>

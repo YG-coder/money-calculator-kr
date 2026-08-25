@@ -1,67 +1,106 @@
 // src/lib/dsr.ts
 // ─────────────────────────────────────────────
-// 스트레스 DSR 정책 엔진 (v1 — 주택담보대출 전용)
+// 스트레스 DSR 계산 엔진
 //
-// 검증일: 2026-08-08
-// 근거:
-//   · 금융위원회 '3단계 스트레스 DSR 시행방안' 보도자료 (2025-07-01 시행)
-//   · 금융위 '스트레스 DSR 3단계 행정지도 변경시행 예고' (2026-06-18)
-//       — 지방 주담대는 2026-12-31까지 2단계(0.75%) 유지 유예
-//   · 전국은행연합회 소비자포털 스트레스 금리 공시
+// ⚠️ 이 파일에는 정책값을 두지 않습니다.
+//    모든 수치는 @/lib/policy/dsr 에서 가져옵니다.
+//    값을 고쳐야 한다면 이 파일이 아니라 정책 파일을 고치세요.
 //
-// ⚠️ 이 상수들은 규제 변경에 따라 바뀝니다. 값 수정 시 반드시 검증일과
-//    근거를 함께 갱신하세요. (지방 유예 종료일 2026-12-31 경과 시 재확인 필요)
+// 조사 근거: 프로젝트 문서 claude/DSR-POLICY-2026-08.md (rev.2)
 //
-// v1 범위:
-//   · 대상: 주택담보대출만. (신용·기타대출은 v2 — 아래 스펙 주석 참고)
+// 현재 범위:
+//   · 대상: 주택담보대출. (신용대출·전세자금대출은 다음 단계)
 //   · 기존 부채 = 사용자가 DSR 산정용 연간 원리금을 직접 입력
 //   · 신규 대출 = 원리금균등 / 원금균등 만 지원 (만기일시·거치식 제외)
 //   · 금리유형 = 변동형 / 순수고정형 만 지원 (혼합형·주기형 제외)
 //
-// ── v2 신용대출 지원 시 필요 (검증일 2026-08-08, 출처 금융위 3단계 시행방안) ──
-//   1) 게이팅: 신용대출 총잔액(기존+신규)이 1억원 초과 시에만 스트레스 적용
-//   2) 스트레스 배율: 변동 100%(1.5%), 3년~5년 미만 고정 60%(≈0.9%),
-//                     5년 이상 고정 0%
-//   3) 원리금 산정: 실제 약정만기·상환방식 무시, 일괄 5년 만기 원금균등
-//                   (원금/5년 + 이자)로 산정
-//   4) 전세자금대출: 원금 제외, 이자만 DSR 반영
-//   5) 추정 가능액 모드: 1억원 경계 전후로 스트레스 적용 여부가 갈리므로
-//                        두 구간(무적용/적용)으로 분기 계산 필요
+// ── 다음 단계에서 다룰 것 (근거는 정책 문서 rev.2 참고) ──
+//   1) 신용대출
+//        · 게이팅: 신용대출 총잔액(기존+신규) 1억원 초과 시에만 스트레스 적용
+//        · 금리유형별 적용비율: 5년↑ 고정 0% / 3~5년 고정 60% / 그 밖 100%
+//        · 지역 구분 없음 — 지방 유예는 주담대 한정이므로 Region 을 넘기지 말 것
+//        · 산정만기 5년 (일시상환·마이너스통장). 마이너스통장은 약정한도 전액 기준
+//        · ⚠️ "모든 신용대출 일괄 5년" 아님 — 적격 분할상환은 실제만기 예외가 있으나
+//             인정 요건·산식의 1차 원문 미확인 → 사용자 직접 입력으로 처리
+//   2) 전세자금대출 — 단일 규칙 아님
+//        · 무주택자: DSR 산정 제외
+//        · 1주택 + 수도권·규제지역 임차: 이자상환분만 반영
+//        · 단순 만기연장: 신규 적용 제외 / 증액분: 신규대출로 취급
+//        · 그 밖: 자동 판정하지 않음
 // ─────────────────────────────────────────────
 
-import { monthlyRate, equalPaymentMonthly, principalFromPayment } from "@/lib/loan";
+import {
+  monthlyRate,
+  equalPaymentMonthly,
+  principalFromPayment,
+} from "@/lib/loan";
+import {
+  DSR_POLICY_META,
+  getMortgageStressRatePct,
+  LOCAL_MORTGAGE_DEFERRAL_UNTIL,
+  DSR_LIMIT,
+  type MortgageRegion,
+} from "@/lib/policy/dsr";
+
+export { LOCAL_MORTGAGE_DEFERRAL_UNTIL, DSR_LIMIT };
 
 // ── 타입 ──
-export type Region = "metro" | "local"; // 수도권·규제지역 / 지방(비규제)
+/**
+ * 주택담보대출 지역 구분.
+ * 정책 레이어의 MortgageRegion 과 같은 타입입니다(기존 이름 유지).
+ */
+export type Region = MortgageRegion; // "metro" | "local"
 export type RateType = "variable" | "fixed"; // 변동형 / 순수고정형(만기까지 고정)
 export type DsrRepayment = "equal_payment" | "equal_principal"; // 원리금균등 / 원금균등
 
-// ── 정책 상수 (검증일 2026-08-08) ──
-export const DSR_VERIFIED_DATE = "2026-08-08";
-export const LOCAL_MORTGAGE_DEFERRAL_UNTIL = "2026-12-31";
+/** 정책 검증일 — 정책 레이어가 단일 출처 */
+export const DSR_VERIFIED_DATE = DSR_POLICY_META.verifiedAt;
 
-// 주담대 변동형(100%) 기준 스트레스 금리(%p)
-//   수도권·규제지역 : 3.0  (3단계 하한, 상한 없음)
-//   지방(비규제)     : 0.75 (2단계 유지 — 유예 ~2026-12-31)
-const MORTGAGE_VARIABLE_STRESS_RATE: Record<Region, number> = {
-  metro: 3.0,
-  local: 0.75,
-};
+/**
+ * 정책값을 찾지 못하면 값을 추정하지 않고 사유를 돌려준다.
+ * (lib/policy/types 의 lookupPolicy 와 같은 규약)
+ */
+export type DsrOutcome<T> =
+  { status: "ok"; value: T } | { status: "unsupported"; reason: string };
 
-// DSR 규제 한도(%) 참고 기본값 — 은행권 40 / 비은행권 50
-export const DSR_LIMIT = { bank: 40, nonbank: 50 } as const;
+/** 오늘(Asia/Seoul) YYYY-MM-DD. 유예 만료 판정에 쓴다. */
+export function todayKst(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
 
 // ─────────────────────────────────────────────
 // 유효 스트레스 금리(%p) — 주택담보대출
-//   v1: 변동형 100%(지역별 3.0/0.75), 순수고정형 0% (혼합·주기형 미지원)
+//   변동형: 정책 레이어에서 지역별로 조회
+//   순수고정형(만기까지 고정): 미래 금리변동 위험이 없어 0
+//
+//   ⚠️ 지방 유예가 만료되면 정책 레이어가 값을 돌려주지 않습니다.
+//      그 경우 임의 대체값을 쓰지 않고 unsupported 로 되돌립니다.
 // ─────────────────────────────────────────────
 export function getEffectiveStressRate(params: {
   region: Region;
   rateType: RateType;
-}): number {
-  // 순수고정형(만기까지 고정)은 미래 금리변동 위험이 없어 스트레스 0
-  if (params.rateType === "fixed") return 0;
-  return MORTGAGE_VARIABLE_STRESS_RATE[params.region];
+  asOf?: string;
+}): DsrOutcome<number> {
+  if (params.rateType === "fixed") return { status: "ok", value: 0 };
+
+  const asOf = params.asOf ?? todayKst();
+  const pct = getMortgageStressRatePct({ region: params.region, asOf });
+
+  if (pct === null) {
+    return {
+      status: "unsupported",
+      reason:
+        `지방(비규제) 주택담보대출의 스트레스 금리 유예가 ${LOCAL_MORTGAGE_DEFERRAL_UNTIL}자로 종료되어, ` +
+        "현재 적용 기준을 확인하기 전에는 계산하지 않습니다. 금융회사 또는 금융위원회 공시로 확인하세요.",
+    };
+  }
+
+  return { status: "ok", value: pct };
 }
 
 // ─────────────────────────────────────────────
@@ -111,6 +150,8 @@ export interface DsrCheckInput {
   region: Region;
   rateType: RateType;
   limitPercent: number; // 선택한 DSR 기준 (40 | 50)
+  /** 유예 만료 판정 기준일. 생략하면 오늘(Asia/Seoul) */
+  asOf?: string;
 }
 
 export interface DsrCheckResult {
@@ -125,12 +166,15 @@ export interface DsrCheckResult {
   exceedByPct: number; // %p (dsrStressed − limit)
 }
 
-export function calcDsr(input: DsrCheckInput): DsrCheckResult {
-  const effectiveStressRate = getEffectiveStressRate({
+export function calcDsr(input: DsrCheckInput): DsrOutcome<DsrCheckResult> {
+  const stress = getEffectiveStressRate({
     region: input.region,
     rateType: input.rateType,
+    asOf: input.asOf,
   });
+  if (stress.status === "unsupported") return stress;
 
+  const effectiveStressRate = stress.value;
   const stressedRatePercent = input.ratePercent + effectiveStressRate;
 
   const newAnnualDebtNormal = calcNewLoanAnnualDebtService(
@@ -165,15 +209,18 @@ export function calcDsr(input: DsrCheckInput): DsrCheckResult {
     (input.existingAnnualDebt + newAnnualDebtStressed);
 
   return {
-    effectiveStressRate,
-    stressedRatePercent,
-    newAnnualDebtNormal,
-    newAnnualDebtStressed,
-    dsrNormal,
-    dsrStressed,
-    headroomAnnual,
-    exceeded: dsrStressed > input.limitPercent,
-    exceedByPct: dsrStressed - input.limitPercent,
+    status: "ok",
+    value: {
+      effectiveStressRate,
+      stressedRatePercent,
+      newAnnualDebtNormal,
+      newAnnualDebtStressed,
+      dsrNormal,
+      dsrStressed,
+      headroomAnnual,
+      exceeded: dsrStressed > input.limitPercent,
+      exceedByPct: dsrStressed - input.limitPercent,
+    },
   };
 }
 
@@ -193,6 +240,8 @@ export interface DsrEstimateInput {
   months: number;
   region: Region;
   rateType: RateType;
+  /** 유예 만료 판정 기준일. 생략하면 오늘(Asia/Seoul) */
+  asOf?: string;
 }
 
 export interface DsrEstimateResult {
@@ -206,12 +255,15 @@ export interface DsrEstimateResult {
 
 export function estimatePrincipalFromDsr(
   input: DsrEstimateInput,
-): DsrEstimateResult {
-  const effectiveStressRate = getEffectiveStressRate({
+): DsrOutcome<DsrEstimateResult> {
+  const stress = getEffectiveStressRate({
     region: input.region,
     rateType: input.rateType,
+    asOf: input.asOf,
   });
+  if (stress.status === "unsupported") return stress;
 
+  const effectiveStressRate = stress.value;
   const stressedRatePercent = input.ratePercent + effectiveStressRate;
 
   const allowedAnnualDebt = (input.annualIncome * input.limitPercent) / 100;
@@ -234,11 +286,14 @@ export function estimatePrincipalFromDsr(
   );
 
   return {
-    effectiveStressRate,
-    stressedRatePercent,
-    allowedAnnualDebt,
-    availableForNew,
-    estimatedPrincipal,
-    monthlyPaymentActual,
+    status: "ok",
+    value: {
+      effectiveStressRate,
+      stressedRatePercent,
+      allowedAnnualDebt,
+      availableForNew,
+      estimatedPrincipal,
+      monthlyPaymentActual,
+    },
   };
 }
