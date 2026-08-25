@@ -48,6 +48,13 @@ const LOAN_CALCS = [
     badge: null,
   },
   {
+    title: "LTV 계산기",
+    desc: "주택 가격·지역·보유 상황으로 담보 기준 한도를 계산합니다. 구간별 절대한도와 방공제 차감 반영.",
+    href: "/ltv-calculator",
+    icon: "📏",
+    badge: "신규",
+  },
+  {
     title: "마이너스통장 계산기",
     desc: "한도가 아니라 실제 사용금액 기준으로 일·월·연 이자와 사용률을 계산합니다.",
     href: "/minus-account-calculator",

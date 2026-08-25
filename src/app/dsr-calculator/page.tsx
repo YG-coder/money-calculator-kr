@@ -198,7 +198,8 @@ export default function Page() {
               <p className="font-bold">DSR과 함께 확인하면 좋은 것</p>
               <p className="mt-2">
                 DSR로 소득 대비 한도를 확인했다면, 실제 월 상환액과 상환 방식은{" "}
-                원리금상환 계산기에서, 담보 기준 한도는 LTV까지 함께 검토하세요.
+                원리금상환 계산기에서, 담보 기준 한도는 LTV 계산기에서 함께 검토하세요.
+                실제 한도는 두 값 중 낮은 쪽입니다.
               </p>
             </div>
           </>
@@ -206,6 +207,7 @@ export default function Page() {
         examples={EXAMPLES}
         faq={FAQ}
         relatedCalcs={[
+          { label: "LTV 계산기 (담보 기준 한도)", href: "/ltv-calculator", icon: "📏" },
           { label: "대출이자 계산기", href: "/loan-interest-calculator", icon: "🏦" },
           { label: "원리금상환 계산기", href: "/amortization-calculator", icon: "📊" },
           { label: "전세대출 계산기", href: "/jeonse-loan-calculator", icon: "🏠" },

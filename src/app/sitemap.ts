@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "jeonse-loan-calculator", priority: 0.9, freq: "monthly" },
     { path: "prepayment-calculator", priority: 0.9, freq: "monthly" },
     { path: "dsr-calculator", priority: 0.9, freq: "monthly" },
+    { path: "ltv-calculator", priority: 0.9, freq: "monthly" },
     { path: "minus-account-calculator", priority: 0.9, freq: "monthly" },
     { path: "refinance-calculator", priority: 0.9, freq: "monthly" },
     { path: "rate-change-simulator", priority: 0.9, freq: "monthly" },

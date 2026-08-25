@@ -16,6 +16,7 @@ const NAV_GROUPS = [
       { href: "/jeonse-loan-calculator", label: "전세대출 계산기" },
       { href: "/prepayment-calculator", label: "중도상환 계산기" },
       { href: "/dsr-calculator", label: "DSR 계산기" },
+      { href: "/ltv-calculator", label: "LTV 계산기" },
       { href: "/minus-account-calculator", label: "마이너스통장 계산기" },
       { href: "/refinance-calculator", label: "대환대출 계산기" },
       { href: "/rate-change-simulator", label: "금리변동 시뮬레이터" },
