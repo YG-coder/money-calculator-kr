@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useCalcState } from "@/hooks/useCalcState";
+import { readNum, readWon, isFilled } from "@/lib/calcInput";
 import { formatKRW, formatUnit } from "@/lib/loan";
 import {
   calcDsr,
@@ -14,6 +15,7 @@ import {
 } from "@/lib/dsr";
 import InputField from "@/components/calculator/InputField";
 import ResultCard from "@/components/calculator/ResultCard";
+import ToggleGroup from "@/components/calculator/ToggleGroup";
 
 type Mode = "check" | "estimate";
 
@@ -28,60 +30,8 @@ const FIELDS = [
 // 퍼센트 표기 시 부동소수점 잔여(예: 4.05000001) 정리
 const trimPct = (n: number) => Number(n.toFixed(2));
 
-// ── 내부 토글 그룹 (AmortizationCalc 버튼 그리드 패턴 재사용) ──
-function ToggleGroup<T extends string>({
-  label,
-  hint,
-  value,
-  options,
-  onChange,
-  gridClass = "grid-cols-2",
-}: {
-  label: string;
-  hint?: string;
-  value: T;
-  options: { value: T; label: string }[];
-  onChange: (v: T) => void;
-  gridClass?: string;
-}) {
-  return (
-    <div>
-      <p className="mb-2 text-sm font-semibold text-slate-600">{label}</p>
-      <div className={`grid gap-2 ${gridClass}`}>
-        {options.map((o) => (
-          <button
-            key={o.value}
-            type="button"
-            onClick={() => onChange(o.value)}
-            className={`rounded-xl border py-3 text-sm font-bold transition-all ${
-              value === o.value
-                ? "border-brand-600 bg-brand-600 text-white shadow-sm"
-                : "border-slate-200 bg-white text-slate-600 hover:border-brand-300"
-            }`}
-          >
-            {o.label}
-          </button>
-        ))}
-      </div>
-      {hint && <p className="mt-1.5 text-xs text-slate-400">{hint}</p>}
-    </div>
-  );
-}
-
 export default function DsrCalc() {
   const { state, setValue } = useCalcState(FIELDS);
-
-  // ⚠️ 반응성: useCalcState의 getWon/getNum은 useEffect로 한 박자 뒤에 갱신되는
-  // latestStateRef를 읽어, 마지막 입력 시점에 stale 값이 잡힌다. useMemo는 state에
-  // 의존해 렌더 중 실행되므로, 여기서는 현재 렌더의 state.raw를 직접 읽는다.
-  const won = (key: string): number => {
-    const n = Number(state[key]?.raw ?? "0");
-    return isNaN(n) ? 0 : n * 10_000;
-  };
-  const num = (key: string): number => {
-    const n = Number(state[key]?.raw ?? "0");
-    return isNaN(n) ? 0 : n;
-  };
 
   const [mode, setMode] = useState<Mode>("check");
   const [region, setRegion] = useState<Region>("metro");
@@ -90,45 +40,43 @@ export default function DsrCalc() {
   const [limitPercent, setLimitPercent] = useState<40 | 50>(40);
 
   // 금리 0%는 유효한 입력이므로 truthy 검사 대신 빈 문자열 여부로 판정
-  const rateFilled = (state.rate?.raw ?? "") !== "";
+  const rateFilled = isFilled(state, "rate");
 
   const checkResult = useMemo(() => {
     if (mode !== "check") return null;
-    const income = won("income");
-    const amount = won("amount");
-    const months = num("months");
+    const income = readWon(state, "income");
+    const amount = readWon(state, "amount");
+    const months = readNum(state, "months");
     if (!income || !amount || !months || !rateFilled) return null;
 
     return calcDsr({
       annualIncome: income,
-      existingAnnualDebt: won("existingDebt"),
+      existingAnnualDebt: readWon(state, "existingDebt"),
       newPrincipal: amount,
-      ratePercent: num("rate"),
+      ratePercent: readNum(state, "rate"),
       months,
       repayment,
       region,
       rateType,
       limitPercent,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, mode, region, rateType, repayment, limitPercent, rateFilled]);
 
   const estimateResult = useMemo(() => {
     if (mode !== "estimate") return null;
-    const income = won("income");
-    const months = num("months");
+    const income = readWon(state, "income");
+    const months = readNum(state, "months");
     if (!income || !months || !rateFilled) return null;
 
     return estimatePrincipalFromDsr({
       annualIncome: income,
-      existingAnnualDebt: won("existingDebt"),
+      existingAnnualDebt: readWon(state, "existingDebt"),
       limitPercent,
-      ratePercent: num("rate"),
+      ratePercent: readNum(state, "rate"),
       months,
       region,
       rateType,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, mode, region, rateType, limitPercent, rateFilled]);
 
   return (
