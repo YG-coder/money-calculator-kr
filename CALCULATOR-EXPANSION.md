@@ -628,16 +628,33 @@ PR 2 가 `calcAcquisitionTax` 를 재사용하므로 먼저 진행합니다. 202
 추가했습니다. 생애최초 85㎡ 초과는 감면분 농어촌특별세의 세목 결합을 과대·과소 추정하지
 않도록 v1에서 자동 감면하지 않고 안내합니다.
 
-### PR 2 — `feat(realestate): 부동산 실투자금 계산기 추가`
+### ✅ PR 2 — `feat(realestate): 부동산 실투자금 계산기 추가` (완료 2026-08-25)
 
-- [ ] `src/lib/policy/brokerage.ts` — 중개보수 상한요율표 (`basis: nationalCeiling`)
-      · 부가세 일반과세 10% 기본 포함 + 제외 토글, 라벨 "일반과세 중개사 기준 예상 최대"
-      · 시·도 폴백 구조 만들지 않음. 서울·경기만 조례 일치 확인 표시
-      · 근거: `BROKERAGE-POLICY-2026-08.md`
-- [ ] `src/lib/realEstate.ts`에 `calcInitialCost()` 추가 (`calcAcquisitionTax` 재사용)
-- [ ] `src/components/calculator/InitialCostCalc.tsx`
-- [ ] `src/app/real-estate/initial-cost-calculator/page.tsx`
-- [ ] 등록 6곳 + **`property-yield-calculator` 페이지의 "취득비용 미반영" 문단에 링크 추가**
+- [x] `src/lib/policy/brokerage.ts` — 중개보수 6구간 상한요율표 + 한도액, `PolicyMeta`
+      · `basis: nationalCeiling` — **시·도 폴백 구조 만들지 않음**
+      · `VERIFIED_LOCAL_ORDINANCES = ["서울특별시", "경기도"]`
+      · `effectiveFrom: 2021-12-30` (요율 적용 시작일, 조례 버전 2022-12-30 과 구분)
+- [x] `src/lib/initialCost.ts` — `calcInitialCost()`. PR 2a 취득세 엔진 재사용
+- [x] `src/lib/initialCost.test.ts` — 22개 (구간 경계·한도액·VAT·명시 선택·취득세 연동)
+- [x] `src/components/calculator/InitialCostCalc.tsx` — 등기·법무 3상태 명시 선택
+- [x] `src/app/real-estate/initial-cost-calculator/page.tsx`
+- [x] 등록 7곳: `index.ts` · Header · `/real-estate` 허브 · `sitemap.ts` · Footer ·
+      취득세 페이지 역링크 · **수익률 페이지의 “취득비용 미반영” 문단에 링크**
+- [x] `relatedGuides` 는 공개 확인된 글만 (`acquisition-tax-guide`, `property-yield-guide`)
+
+검증: `vitest run` 85/85 · `tsc --noEmit` 0 · `eslint .` 에러 0(경고 2, 기준선 동일) ·
+`next build` **46 페이지**(45 → +1) · 실브라우저 스모크 19항목 통과
+
+**정책 근거**: `BROKERAGE-POLICY-2026-08.md` (rev.2)
+
+**설계 결정 (E1~E4)**
+- E1 취득세 누락 3건은 **PR 2a 에서 선행 처리**. 이 계산기는 보완된 엔진을 그대로 재사용
+- E2 부가세 일반과세 10% 기본 포함 + 제외 토글. 라벨 "예상 최대 중개보수"
+- E3 시·도 폴백 없음. 국토부 상한 단일 정책 + 서울·경기 조례 일치 확인 고지
+- E4 기타 비용 선택 입력(기본 0). 이사·수리·가전 예시 제공
+- 등기·법무 비용은 **명시 선택**(직접 입력 / 포함하지 않음). 항상 발생하는 비용이라
+  조용한 0원이 총 필요자금을 과소 표시하기 때문. 자동 계산은 하지 않음(국민주택채권
+  할인율 일 단위 변동)
 
 ### PR 3 — `feat(dsr): 신용대출·전세자금대출 DSR 반영 (v2)`
 
