@@ -6,6 +6,7 @@ import { formatKRW } from "@/lib/loan";
 import {
   calcJeonseWolseConversion,
   CONVERSION_RATE_INFO,
+  getLegalConversionCapPct,
 } from "@/lib/realEstate";
 import InputField from "@/components/calculator/InputField";
 import ResultCard from "@/components/calculator/ResultCard";
@@ -118,10 +119,7 @@ export default function JeonseWolseConversionCalc() {
         <p>
           ※ 법정 상한(주택) = 연 10%와 (한국은행 기준금리 + 연 2%) 중 낮은 값.
           현재 기준금리 {CONVERSION_RATE_INFO.baseRatePct}% 기준 상한{" "}
-          {Math.min(
-            CONVERSION_RATE_INFO.fixedCapPct,
-            CONVERSION_RATE_INFO.baseRatePct + CONVERSION_RATE_INFO.legalAddPct,
-          ).toFixed(2)}
+          {getLegalConversionCapPct().toFixed(2)}
           %입니다(검증일 {CONVERSION_RATE_INFO.verifiedAt}, 기준금리 변동 시 상한도
           바뀝니다).
         </p>

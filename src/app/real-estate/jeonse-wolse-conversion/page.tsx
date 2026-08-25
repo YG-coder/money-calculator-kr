@@ -4,6 +4,10 @@ import { Suspense } from "react";
 import { buildMetadata, BASE_URL } from "@/lib/metadata";
 import CalcShell, { type CalcExample } from "@/components/calculator/CalcShell";
 import JeonseWolseConversionCalc from "@/components/calculator/JeonseWolseConversionCalc";
+import {
+  CONVERSION_RATE_INFO,
+  getLegalConversionCapPct,
+} from "@/lib/realEstate";
 
 export const metadata: Metadata = buildMetadata({
   slug: "real-estate/jeonse-wolse-conversion",
@@ -22,6 +26,22 @@ const crumbs = [
   },
 ];
 
+// 예시 수치는 정책 상수에서 파생시킨다.
+// 기준금리를 바꿀 때 상수 한 곳만 고치면 계산기와 예시가 함께 따라오게 하기 위함이다.
+// (하드코딩하면 금통위 이후 예시만 옛 값으로 남는다)
+const CAP_PCT = getLegalConversionCapPct();
+const capLabel = `${CAP_PCT.toFixed(2)}%`;
+
+/** 전환 대상 금액(만원)에 법정 상한을 적용했을 때의 월세(만원) */
+function capMonthlyMan(convertedMan: number): number {
+  return (convertedMan * (CAP_PCT / 100)) / 12;
+}
+
+const EX1_CONVERTED_MAN = 10_000; // 전세 3억 → 보증금 2억
+const EX2_CONVERTED_MAN = 20_000; // 전세 4억 → 보증금 2억
+const EX1_RATE_PCT = 6.0;
+const EX2_RATE_PCT = 3.6;
+
 const EXAMPLES: CalcExample[] = [
   {
     title: "전세 3억 → 보증금 2억 + 월세 50만",
@@ -32,12 +52,23 @@ const EXAMPLES: CalcExample[] = [
       { label: "월세", value: "50만원" },
     ],
     results: [
-      { label: "적용 전환율", value: "6.00%", highlight: true },
-      { label: "법정 상한(주택)", value: "4.75%" },
-      { label: "상한 대비", value: "초과" },
-      { label: "상한 적용 시 월세", value: "약 39.6만원" },
+      { label: "적용 전환율", value: `${EX1_RATE_PCT.toFixed(2)}%`, highlight: true },
+      { label: "법정 상한(주택)", value: capLabel },
+      { label: "상한 대비", value: EX1_RATE_PCT > CAP_PCT ? "초과" : "이하" },
+      {
+        label: "상한 적용 시 월세",
+        value: `약 ${capMonthlyMan(EX1_CONVERTED_MAN).toFixed(1)}만원`,
+      },
     ],
-    note: "1억원을 월세로 돌리면서 월 50만원을 받으면 전환율은 6.0%로, 현재 법정 상한 4.75%(연 10%와 기준금리 2.75% + 2% 중 낮은 값)를 넘습니다. 같은 조건에서 법정 상한을 적용하면 월세는 약 39.6만원이 됩니다. 이 상한은 기존 임대차에서 보증금을 월세로 전환하는 경우에 적용되는 기준입니다.",
+    note: `1억원을 월세로 돌리면서 월 50만원을 받으면 전환율은 ${EX1_RATE_PCT.toFixed(
+      1,
+    )}%로, 현재 법정 상한 ${capLabel}(연 ${CONVERSION_RATE_INFO.fixedCapPct}%와 기준금리 ${
+      CONVERSION_RATE_INFO.baseRatePct
+    }% + ${CONVERSION_RATE_INFO.legalAddPct}% 중 낮은 값)를 넘습니다. 같은 조건에서 법정 상한을 적용하면 월세는 약 ${capMonthlyMan(
+      EX1_CONVERTED_MAN,
+    ).toFixed(
+      1,
+    )}만원이 됩니다. 이 상한은 기존 임대차에서 보증금을 월세로 전환하는 경우에 적용되는 기준입니다.`,
   },
   {
     title: "전세 4억 → 보증금 2억 + 월세 60만",
@@ -48,12 +79,19 @@ const EXAMPLES: CalcExample[] = [
       { label: "월세", value: "60만원" },
     ],
     results: [
-      { label: "적용 전환율", value: "3.60%", highlight: true },
-      { label: "법정 상한(주택)", value: "4.75%" },
-      { label: "상한 대비", value: "이하" },
-      { label: "상한 적용 시 월세", value: "약 79.2만원" },
+      { label: "적용 전환율", value: `${EX2_RATE_PCT.toFixed(2)}%`, highlight: true },
+      { label: "법정 상한(주택)", value: capLabel },
+      { label: "상한 대비", value: EX2_RATE_PCT > CAP_PCT ? "초과" : "이하" },
+      {
+        label: "상한 적용 시 월세",
+        value: `약 ${capMonthlyMan(EX2_CONVERTED_MAN).toFixed(1)}만원`,
+      },
     ],
-    note: "2억원을 월세로 돌리면서 월 60만원을 받으면 전환율은 3.6%로 법정 상한 이하입니다. 같은 조건에서 상한율(4.75%)로 단순 환산하면 월세는 약 79.2만원입니다.",
+    note: `2억원을 월세로 돌리면서 월 60만원을 받으면 전환율은 ${EX2_RATE_PCT.toFixed(
+      1,
+    )}%로 법정 상한 이하입니다. 같은 조건에서 상한율(${capLabel})로 단순 환산하면 월세는 약 ${capMonthlyMan(
+      EX2_CONVERTED_MAN,
+    ).toFixed(1)}만원입니다.`,
   },
 ];
 

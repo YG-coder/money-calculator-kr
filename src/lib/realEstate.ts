@@ -305,6 +305,19 @@ export const CONVERSION_RATE_INFO = {
   source: "한국은행 기준금리 · 주택임대차보호법 제7조의2 · 시행령 제9조",
 };
 
+/**
+ * 주택 전월세 전환 법정 상한(%) = min(연 10%, 기준금리 + 대통령령 이율).
+ *
+ * 같은 계산이 엔진·컴포넌트·페이지 예시에 흩어져 있으면 기준금리를 바꿀 때
+ * 일부만 갱신되어 화면 안에서 값이 어긋난다. 단일 함수로 둔다.
+ */
+export function getLegalConversionCapPct(): number {
+  return Math.min(
+    CONVERSION_RATE_INFO.fixedCapPct,
+    CONVERSION_RATE_INFO.baseRatePct + CONVERSION_RATE_INFO.legalAddPct,
+  );
+}
+
 export interface ConversionInput {
   jeonseDepositMan: number; // 전세보증금 (만원)
   wolseDepositMan: number; // 전환 후 월세보증금 (만원)
@@ -326,10 +339,7 @@ export function calcJeonseWolseConversion(
 
   const converted = jeonseDepositMan - wolseDepositMan; // 만원 (전환 대상)
   // 법정 상한 = min(연 10%, 기준금리 + 대통령령 이율) — 주임법 제7조의2 각 호 중 낮은 비율
-  const legalCapPct = Math.min(
-    CONVERSION_RATE_INFO.fixedCapPct,
-    CONVERSION_RATE_INFO.baseRatePct + CONVERSION_RATE_INFO.legalAddPct,
-  );
+  const legalCapPct = getLegalConversionCapPct();
 
   if (converted <= 0) {
     return {
