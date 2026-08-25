@@ -3,8 +3,14 @@
 // formatKRW, formatUnit 은 @/lib/loan 에서 export 되어 있으므로 중복 정의 없음
 
 /* ─────────────────────────────────────────────
-   취득세 계산 (주택 · 2026-08-02 지방세법 기준 검증)
+   취득세 계산 (주택 · 2026-08-25 지방세법 기준 검증)
 ───────────────────────────────────────────── */
+
+import {
+  firstHomeReductionLimit,
+  NON_METRO_LOW_PRICE_LIMIT_WON,
+  type FirstHomeReduction,
+} from "@/lib/policy/acquisitionTax";
 
 export type OwnershipType = "first" | "second" | "third" | "fourth_plus";
 
@@ -14,6 +20,11 @@ export interface AcquisitionTaxResult {
   localEduTax:     number;   // 지방교육세 (원)
   totalTax:        number;   // 합계 (원)
   taxRate:         number;   // 취득세율 (소수, e.g. 0.01)
+  appliedRule: "standard" | "heavy" | "lowPriceExempt" | "temporaryTwoHouse";
+  reductionWon: number;
+  totalTaxBeforeReduction: number;
+  notes: string[];
+  unsupportedReason?: string;
   breakdown: {
     acquisitionTaxRate: string;   // "1%"
     farmSpecialTaxRate:  string;
@@ -48,17 +59,47 @@ function pctStr(r: number): string {
   return `${parseFloat(v.toFixed(4))}%`;
 }
 
-export function calcAcquisitionTax(
-  priceMan: number,           // 취득가액 (만원)
-  ownership: OwnershipType,
-  isAdjustedArea: boolean,    // 조정대상지역 (2·3주택에서 유효)
-  isOver85: boolean,          // 전용면적 85㎡ 초과 여부 (농어촌특별세 과세 기준)
-): AcquisitionTaxResult {
+export interface AcquisitionTaxInput {
+  priceMan: number;
+  ownership: OwnershipType;
+  isAdjustedArea: boolean;
+  isOver85: boolean;
+  isMetroArea?: boolean;
+  officialPriceMan?: number;
+  /** 경계값 테스트용 원 단위 입력. 있으면 officialPriceMan보다 우선한다. */
+  officialPriceWon?: number;
+  isRedevelopmentZone?: boolean;
+  firstHomeReduction?: FirstHomeReduction;
+  isTemporaryTwoHouse?: boolean;
+}
+
+export function calcAcquisitionTax(input: AcquisitionTaxInput): AcquisitionTaxResult {
+  const {
+    priceMan,
+    ownership,
+    isAdjustedArea,
+    isOver85,
+    isMetroArea,
+    officialPriceMan,
+    officialPriceWon: exactOfficialPriceWon,
+    isRedevelopmentZone = false,
+    firstHomeReduction = "none",
+    isTemporaryTwoHouse = false,
+  } = input;
   const priceWon = priceMan * 10_000;
+
+  const officialPriceWon = exactOfficialPriceWon ??
+    (officialPriceMan === undefined ? undefined : officialPriceMan * 10_000);
+  const lowPriceExempt = ownership !== "first" &&
+    isMetroArea === false &&
+    officialPriceWon !== undefined &&
+    officialPriceWon <= NON_METRO_LOW_PRICE_LIMIT_WON &&
+    !isRedevelopmentZone;
+  const temporaryTwoHouse = ownership === "second" && isTemporaryTwoHouse;
 
   // 취득세 본세율 (지방세법 §11 · §13의2)
   let taxRate = 0;
-  if (ownership === "first") {
+  if (ownership === "first" || lowPriceExempt || temporaryTwoHouse) {
     taxRate = firstHouseRate(priceWon);
   } else if (ownership === "second") {
     taxRate = isAdjustedArea ? 0.08 : firstHouseRate(priceWon);
@@ -82,10 +123,47 @@ export function calcAcquisitionTax(
     else                       farmSpecialTaxRate = 0.002;
   }
 
-  const acquisitionTax = Math.floor(priceWon * taxRate);
-  const farmSpecialTax  = Math.floor(priceWon * farmSpecialTaxRate);
-  const localEduTax     = Math.floor(priceWon * localEduTaxRate);
+  const acquisitionTaxBeforeReduction = Math.floor(priceWon * taxRate);
+  const farmSpecialTaxBeforeReduction = Math.floor(priceWon * farmSpecialTaxRate);
+  const localEduTaxBeforeReduction = Math.floor(priceWon * localEduTaxRate);
+  const totalTaxBeforeReduction = acquisitionTaxBeforeReduction +
+    farmSpecialTaxBeforeReduction + localEduTaxBeforeReduction;
+
+  const notes: string[] = [];
+  let unsupportedReason: string | undefined;
+  let reductionWon = 0;
+  let acquisitionTax = acquisitionTaxBeforeReduction;
+  let localEduTax = localEduTaxBeforeReduction;
+  let farmSpecialTax = farmSpecialTaxBeforeReduction;
+
+  if (firstHomeReduction !== "none") {
+    if (priceWon > 1_200_000_000) {
+      notes.push("취득가액 12억원 초과로 생애최초 감면을 적용하지 않았습니다.");
+    } else if (ownership !== "first") {
+      notes.push("생애최초 감면은 첫 주택 취득에만 적용합니다.");
+    } else if (isOver85) {
+      unsupportedReason = "85㎡ 초과 생애최초 감면은 감면분 농어촌특별세 확인이 필요해 자동 적용하지 않습니다.";
+    } else {
+      const limit = firstHomeReductionLimit(firstHomeReduction);
+      reductionWon = Math.min(acquisitionTaxBeforeReduction, limit);
+      const reductionRate = acquisitionTaxBeforeReduction > 0
+        ? reductionWon / acquisitionTaxBeforeReduction
+        : 0;
+      acquisitionTax -= reductionWon;
+      localEduTax = Math.floor(localEduTaxBeforeReduction * (1 - reductionRate));
+      farmSpecialTax = 0;
+      notes.push(`생애최초 취득세 감면 ${reductionWon.toLocaleString("ko-KR")}원 적용`);
+    }
+  }
   const totalTax        = acquisitionTax + farmSpecialTax + localEduTax;
+
+  const appliedRule = temporaryTwoHouse
+    ? "temporaryTwoHouse"
+    : lowPriceExempt
+      ? "lowPriceExempt"
+      : isHeavy
+        ? "heavy"
+        : "standard";
 
   return {
     acquisitionTax,
@@ -93,6 +171,11 @@ export function calcAcquisitionTax(
     localEduTax,
     totalTax,
     taxRate,
+    appliedRule,
+    reductionWon,
+    totalTaxBeforeReduction,
+    notes,
+    unsupportedReason,
     breakdown: {
       acquisitionTaxRate: pctStr(taxRate),
       farmSpecialTaxRate:  pctStr(farmSpecialTaxRate),
