@@ -22,6 +22,8 @@ import {
 import InputField from "@/components/calculator/InputField";
 import ResultCard from "@/components/calculator/ResultCard";
 import ToggleGroup from "@/components/calculator/ToggleGroup";
+import Link from "next/link";
+import { CALC_PATH } from "@/lib/handoff";
 
 type Mode = "check" | "estimate";
 type JeonseChoice =
@@ -526,6 +528,27 @@ export default function DsrCalc() {
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {/* ── 담보 축 안내 (상호 링크) ── */}
+      {shown && (
+        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 text-sm text-blue-900">
+          <p className="font-bold">담보 기준 한도도 함께 확인하세요</p>
+          <p className="mt-2 leading-relaxed">
+            실제 대출 한도는 <strong>소득 기준(DSR)</strong>과{" "}
+            <strong>담보 기준(LTV)</strong> 중 낮은 쪽으로 정해집니다. 이
+            계산기는 소득 축만 계산합니다.
+          </p>
+          <Link
+            href={CALC_PATH.ltv}
+            className="mt-3 inline-flex items-center gap-1 font-bold text-blue-700 underline underline-offset-2 hover:text-blue-900"
+          >
+            LTV 계산기로 담보 기준 한도 확인 →
+          </Link>
+          <p className="mt-1 text-xs text-blue-700/80">
+            담보가치·선순위채권·방공제가 필요해 값은 이어지지 않습니다.
+          </p>
         </div>
       )}
 

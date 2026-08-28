@@ -13,6 +13,8 @@ import {
 } from "@/lib/policy/ltv";
 import InputField from "@/components/calculator/InputField";
 import ResultCard from "@/components/calculator/ResultCard";
+import Link from "next/link";
+import { ltvToInitialCostUrl, CALC_PATH } from "@/lib/handoff";
 import ToggleGroup from "@/components/calculator/ToggleGroup";
 import PolicyNote from "@/components/calculator/PolicyNote";
 
@@ -53,6 +55,9 @@ export default function LtvCalc() {
   }, [state, region, borrower, roomMode]);
 
   const result = outcome.status === "ok" ? outcome.result : null;
+
+  // 인계 링크에 넣을 주택가격 (원). 엔진에 넘긴 값과 같은 출처를 쓴다.
+  const priceWon = readWon(state, "price");
 
   return (
     <div className="space-y-5">
@@ -137,7 +142,9 @@ export default function LtvCalc() {
                   <button
                     key={r.area}
                     type="button"
-                    onClick={() => setValue("room", String(r.amountWon / 10_000))}
+                    onClick={() =>
+                      setValue("room", String(r.amountWon / 10_000))
+                    }
                     className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-left text-xs
                                transition-colors hover:border-brand-300 hover:bg-brand-50"
                   >
@@ -151,8 +158,8 @@ export default function LtvCalc() {
                 ))}
               </div>
               <p className="mt-2 text-xs text-slate-400">
-                법정 금액이며 공제 건수는 주택 유형·금융회사 내규에 따라 달라집니다. 위 값은
-                입력 보조용 참고값입니다.
+                법정 금액이며 공제 건수는 주택 유형·금융회사 내규에 따라
+                달라집니다. 위 값은 입력 보조용 참고값입니다.
               </p>
             </div>
           </div>
@@ -170,8 +177,9 @@ export default function LtvCalc() {
             {outcome.missing.includes("roomDeduction") && (
               <li>
                 방공제를 <strong>금액 직접 입력</strong> 또는{" "}
-                <strong>공제하지 않음</strong> 중 하나로 선택하세요. 방공제는 담보 기준
-                한도를 크게 좌우하므로 기본값으로 0원을 적용하지 않습니다.
+                <strong>공제하지 않음</strong> 중 하나로 선택하세요. 방공제는
+                담보 기준 한도를 크게 좌우하므로 기본값으로 0원을 적용하지
+                않습니다.
               </li>
             )}
           </ul>
@@ -266,8 +274,43 @@ export default function LtvCalc() {
           <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 text-sm text-blue-900">
             <p className="font-bold">소득 기준 한도도 함께 확인하세요</p>
             <p className="mt-2 leading-relaxed">
-              실제 대출 한도는 담보 기준 한도와 <strong>DSR 기준 한도 중 낮은 쪽</strong>으로
-              정해집니다. 이 계산기는 담보 축만 계산합니다.
+              실제 대출 한도는 담보 기준 한도와{" "}
+              <strong>DSR 기준 한도 중 낮은 쪽</strong>으로 정해집니다. 이
+              계산기는 담보 축만 계산합니다.
+            </p>
+            <Link
+              href={CALC_PATH.dsr}
+              className="mt-3 inline-flex items-center gap-1 font-bold text-blue-700 underline underline-offset-2 hover:text-blue-900"
+            >
+              DSR 계산기로 소득 기준 한도 확인 →
+            </Link>
+            <p className="mt-1 text-xs text-blue-700/80">
+              소득·기존 부채가 필요해 값은 이어지지 않습니다.
+            </p>
+          </div>
+
+          {/* 다음 단계 — 값 인계 */}
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700">
+            <p className="font-bold text-slate-900">
+              이 한도로 실제 필요한 현금은 얼마일까요?
+            </p>
+            <p className="mt-2 leading-relaxed">
+              취득세·중개보수·등기비용까지 더한 총 필요자금과 실투자금을 이어서
+              계산할 수 있습니다. 주택가격과 담보 기준 한도가 그대로 채워지며,
+              옮겨진 값은 다음 화면에서 수정할 수 있습니다.
+            </p>
+            <Link
+              href={ltvToInitialCostUrl({
+                housePriceWon: priceWon,
+                limitWon: result.limitWon,
+              })}
+              className="mt-3 inline-flex items-center gap-1 font-bold text-brand-700 underline underline-offset-2 hover:text-brand-900"
+            >
+              실투자금 계산기로 이어서 계산 →
+            </Link>
+            <p className="mt-1 text-xs text-slate-500">
+              담보 기준 한도는 상한이며 확정 대출액이 아닙니다. 등기비용처럼
+              직접 골라야 하는 항목은 자동 선택되지 않습니다.
             </p>
           </div>
 

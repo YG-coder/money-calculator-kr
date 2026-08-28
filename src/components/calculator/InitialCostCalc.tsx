@@ -15,6 +15,8 @@ import { VERIFIED_LOCAL_ORDINANCES } from "@/lib/policy/brokerage";
 import InputField from "@/components/calculator/InputField";
 import ResultCard from "@/components/calculator/ResultCard";
 import ToggleGroup from "@/components/calculator/ToggleGroup";
+import Link from "next/link";
+import { initialCostToYieldUrl } from "@/lib/handoff";
 import PolicyNote from "@/components/calculator/PolicyNote";
 
 const FIELDS = [
@@ -39,7 +41,9 @@ export default function InitialCostCalc() {
   const [firstHomeReduction, setFirstHomeReduction] =
     useState<FirstHomeReduction>("none");
   const [isTemporaryTwoHouse, setIsTemporaryTwoHouse] = useState(false);
-  const [isMetroArea, setIsMetroArea] = useState<boolean | undefined>(undefined);
+  const [isMetroArea, setIsMetroArea] = useState<boolean | undefined>(
+    undefined,
+  );
   const [isRedevelopmentZone, setIsRedevelopmentZone] = useState(false);
 
   const [brokerageMode, setBrokerageMode] = useState<"auto" | "amount">("auto");
@@ -73,7 +77,9 @@ export default function InitialCostCalc() {
         isTemporaryTwoHouse,
         isMetroArea,
         officialPriceMan:
-          isMetroArea === false ? readWon(state, "officialPrice") / 10_000 : undefined,
+          isMetroArea === false
+            ? readWon(state, "officialPrice") / 10_000
+            : undefined,
         isRedevelopmentZone,
       },
       brokerage,
@@ -83,12 +89,25 @@ export default function InitialCostCalc() {
       rentDepositWon: readWon(state, "deposit"),
     });
   }, [
-    state, ownership, isAdjustedArea, isOver85, firstHomeReduction,
-    isTemporaryTwoHouse, isMetroArea, isRedevelopmentZone,
-    brokerageMode, includeVat, regMode,
+    state,
+    ownership,
+    isAdjustedArea,
+    isOver85,
+    firstHomeReduction,
+    isTemporaryTwoHouse,
+    isMetroArea,
+    isRedevelopmentZone,
+    brokerageMode,
+    includeVat,
+    regMode,
   ]);
 
   const result = outcome.status === "ok" ? outcome.result : null;
+
+  // 인계 링크용 — 엔진에 넘긴 값과 같은 출처를 쓴다
+  const priceWon = readWon(state, "price");
+  const loanWon = readWon(state, "loan");
+  const rentDepositWon = readWon(state, "deposit");
 
   return (
     <div className="space-y-5">
@@ -146,13 +165,18 @@ export default function InitialCostCalc() {
 
       {ownership === "first" && (
         <div className="space-y-2 rounded-2xl border border-slate-200 p-4">
-          <p className="text-sm font-bold text-slate-700">생애최초 취득세 감면</p>
+          <p className="text-sm font-bold text-slate-700">
+            생애최초 취득세 감면
+          </p>
           {[
             { value: "none" as const, label: "해당 없음" },
             { value: "standard" as const, label: "200만원 한도 요건 확인" },
             { value: "expanded" as const, label: "300만원 한도 요건 확인" },
           ].map((opt) => (
-            <label key={opt.value} className="flex items-center gap-2 text-sm text-slate-600">
+            <label
+              key={opt.value}
+              className="flex items-center gap-2 text-sm text-slate-600"
+            >
               <input
                 type="radio"
                 name="icFirstHome"
@@ -164,8 +188,8 @@ export default function InitialCostCalc() {
             </label>
           ))}
           <p className="text-xs leading-relaxed text-slate-400">
-            취득가액 12억원 이하에 적용됩니다. 자격을 자동 판정하지 않으므로 관할
-            시·군·구청에서 확인하세요.
+            취득가액 12억원 이하에 적용됩니다. 자격을 자동 판정하지 않으므로
+            관할 시·군·구청에서 확인하세요.
           </p>
         </div>
       )}
@@ -179,18 +203,22 @@ export default function InitialCostCalc() {
             className="mt-0.5 accent-brand-600"
           />
           <span>
-            일시적 2주택 — 신규주택 취득일(잔금청산일)로부터 3년 이내 종전주택을 처분할
-            예정입니다.
+            일시적 2주택 — 신규주택 취득일(잔금청산일)로부터 3년 이내 종전주택을
+            처분할 예정입니다.
           </span>
         </label>
       )}
 
       {ownership !== "first" && (
         <div className="space-y-3 rounded-2xl border border-slate-200 p-4">
-          <p className="text-sm font-bold text-slate-700">비수도권 저가주택 중과 배제</p>
+          <p className="text-sm font-bold text-slate-700">
+            비수도권 저가주택 중과 배제
+          </p>
           <ToggleGroup<string>
             label=""
-            value={isMetroArea === undefined ? "" : isMetroArea ? "metro" : "non"}
+            value={
+              isMetroArea === undefined ? "" : isMetroArea ? "metro" : "non"
+            }
             onChange={(v) => setIsMetroArea(v === "metro")}
             options={[
               { value: "metro", label: "수도권" },
@@ -255,8 +283,8 @@ export default function InitialCostCalc() {
             className="mt-0.5 accent-brand-600"
           />
           <span>
-            부가가치세 10% 포함 (일반과세 중개사 기준). 간이과세 중개사는 다를 수 있으니
-            확인이 필요합니다.
+            부가가치세 10% 포함 (일반과세 중개사 기준). 간이과세 중개사는 다를
+            수 있으니 확인이 필요합니다.
           </span>
         </label>
       </div>
@@ -324,12 +352,14 @@ export default function InitialCostCalc() {
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
           <p className="font-bold">입력이 더 필요합니다</p>
           <ul className="mt-2 list-disc space-y-1 pl-5">
-            {outcome.missing.includes("housePrice") && <li>매매가를 입력하세요.</li>}
+            {outcome.missing.includes("housePrice") && (
+              <li>매매가를 입력하세요.</li>
+            )}
             {outcome.missing.includes("registrationCost") && (
               <li>
                 등기·법무 비용을 <strong>금액 직접 입력</strong> 또는{" "}
-                <strong>포함하지 않음</strong> 중 하나로 선택하세요. 실제로는 항상
-                발생하는 비용이므로 기본값 0원을 적용하지 않습니다.
+                <strong>포함하지 않음</strong> 중 하나로 선택하세요. 실제로는
+                항상 발생하는 비용이므로 기본값 0원을 적용하지 않습니다.
               </li>
             )}
           </ul>
@@ -420,6 +450,37 @@ export default function InitialCostCalc() {
             </dl>
           </div>
 
+          {/* 다음 단계 — 값 인계 */}
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700">
+            <p className="font-bold text-slate-900">
+              이 매물의 임대수익률도 확인해 보세요
+            </p>
+            <p className="mt-2 leading-relaxed">
+              매입가·대출금·보증금이 그대로 채워집니다. 월세와 대출 금리를
+              입력하면 수익률이 계산되며, 옮겨진 값은 수정할 수 있습니다.
+            </p>
+            <Link
+              href={initialCostToYieldUrl({
+                purchasePriceWon: priceWon,
+                loanWon,
+                depositWon: rentDepositWon,
+              })}
+              className="mt-3 inline-flex items-center gap-1 font-bold text-brand-700 underline underline-offset-2 hover:text-brand-900"
+            >
+              임대수익률 계산기로 이어서 계산 →
+            </Link>
+            <p className="mt-1 text-xs text-slate-500">
+              ⚠️ 수익률 계산기의 &lsquo;실투자금&rsquo;은 매입가 − 보증금 −
+              대출금이라 이 화면의 실투자금({formatUnit(result.equityWon)})과
+              달리{" "}
+              <strong>
+                부대비용({formatUnit(result.totalExtraCostWon)})이 빠져
+                있습니다.
+              </strong>{" "}
+              자기자본 수익률은 그만큼 높게 나옵니다.
+            </p>
+          </div>
+
           {result.notes.length > 0 && (
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
               <ul className="list-disc space-y-1 pl-5">
@@ -433,8 +494,9 @@ export default function InitialCostCalc() {
           <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 text-sm text-blue-900">
             <p className="font-bold">대출 한도도 함께 확인하세요</p>
             <p className="mt-2 leading-relaxed">
-              대출금은 담보 기준 한도(LTV)와 소득 기준 한도(DSR) 중 낮은 쪽으로 정해집니다.
-              LTV 계산기와 DSR 계산기에서 확인한 금액을 위 대출금 칸에 넣어보세요.
+              대출금은 담보 기준 한도(LTV)와 소득 기준 한도(DSR) 중 낮은 쪽으로
+              정해집니다. LTV 계산기와 DSR 계산기에서 확인한 금액을 위 대출금
+              칸에 넣어보세요.
             </p>
           </div>
 
