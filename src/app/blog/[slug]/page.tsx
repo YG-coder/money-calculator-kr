@@ -91,18 +91,14 @@ export default async function BlogPostPage({ params }: Props) {
               {post.sources.map((src) => (
                 <li key={src.name} className="text-sm leading-relaxed text-slate-600">
                   ·{" "}
-                  {src.url ? (
-                    <a
-                      href={src.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-brand-600 underline underline-offset-2 hover:text-brand-700"
-                    >
-                      {src.name}
-                    </a>
-                  ) : (
-                    src.name
-                  )}
+                  <a
+                    href={src.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand-600 underline underline-offset-2 hover:text-brand-700"
+                  >
+                    {src.name}
+                  </a>
                 </li>
               ))}
             </ul>

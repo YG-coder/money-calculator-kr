@@ -96,8 +96,12 @@ export type BlogPost = {
    * ⚠️ 글이 실제로 근거로 삼은 것만 적는다. 그럴듯한 기관명을 채워 넣지 않는다.
    *    산식만 다루는 글(예: 원리금균등 vs 원금균등)은 외부 근거가 없는 것이
    *    정상이므로 생략한다.
+   *
+   * ⚠️ url 은 **필수**다. 기관 이름만 적어 두면 독자가 확인할 수 없고,
+   *    "근거를 확인했다"는 인상만 준다. 공식 원문 주소를 확인하기 전에는
+   *    항목을 넣지 않는다.
    */
-  sources?: { name: string; url?: string }[];
+  sources?: { name: string; url: string }[];
 };
 
 /**
@@ -119,7 +123,6 @@ export function normalizeContent(content: Block[] | string[]): Block[] {
 export const blogPosts: BlogPost[] = [
   {
     slug: "loan-interest-calculation",
-    sources: [{ name: "한국은행 기준금리" }],
     category: "대출 기초",
     title: "대출 이자 계산 방법 완벽 정리 — 공식부터 실전 비교까지",
     description:
@@ -760,10 +763,14 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: "jeonse-vs-wolse",
+    // HUG·SGI 는 공식 원문 주소를 확인하기 전까지 넣지 않는다.
+    // 본문의 기관별 보증료·한도·대상 설명은 정책에 따라 바뀌므로
+    // 실제 원문을 확인한 뒤 붙여야 한다.
     sources: [
-      { name: "주택도시보증공사(HUG) 전세보증금반환보증" },
-      { name: "한국주택금융공사(HF) 전세자금보증" },
-      { name: "SGI서울보증 전세금보장신용보험" },
+      {
+        name: "한국주택금융공사(HF) 전세자금보증",
+        url: "https://www.hf.go.kr/ko/sub02/sub02_01_01.do",
+      },
     ],
     category: "부동산 임대",
     title: "전세 vs 월세, 어떤 게 더 유리할까? 기회비용·금리 기준 완벽 분석",
