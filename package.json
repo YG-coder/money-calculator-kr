@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "policy:check": "vitest run src/lib/policy/registry.test.ts --reporter=verbose"
   },
   "dependencies": {
     "next": "^16.3.1",

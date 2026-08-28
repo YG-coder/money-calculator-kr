@@ -168,6 +168,8 @@ const DSR_META: PolicyMeta = {
     "(부존재 증명이 아니라 해당 자료 범위에서의 확인 결과입니다)",
   nextReviewHint:
     "2026년 12월 스트레스 금리 반기 발표 / 지방 주담대 유예 2026-12-31 만료 / 차기 가계부채 관리방안 발표",
+  // 스트레스 금리는 6월·12월 발표. 12월 발표 전에 확인한다.
+  reviewBy: "2026-12-01",
 };
 
 export interface CreditStressCondition {

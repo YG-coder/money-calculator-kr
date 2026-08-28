@@ -33,6 +33,8 @@ export const ACQUISITION_TAX_POLICY_META: PolicyMeta = {
   ],
   note: "생애최초 200만원·300만원 트랙은 사용자가 자격을 확인해 명시 선택한다.",
   nextReviewHint: "지방세법·지방세특례제한법 개정 또는 2026년 정기국회 처리 후",
+  // 지방세법은 매년 개정되고 1월 1일 시행이 많다. 연초에 확인한다.
+  reviewBy: "2027-01-31",
 };
 
 export const NON_METRO_LOW_PRICE_LIMIT_WON = 200_000_000;

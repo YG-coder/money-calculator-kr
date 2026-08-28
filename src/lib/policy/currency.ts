@@ -39,6 +39,8 @@ export const CURRENCY_META: PolicyMeta = {
     "빌드 시점 값을 심으면 오래된 수치가 조용히 쓰인다.",
   nextReviewHint:
     "고시 단위·계산 공식·지원 통화 변경 시. 환율을 저장하지 않으므로 정기 수치 갱신은 없다.",
+  // 고시 단위는 거의 바뀌지 않는다. 그래도 영구불변은 아니므로 연 1회 확인.
+  reviewBy: "2027-08-28",
 };
 
 export interface CurrencyInfo {

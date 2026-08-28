@@ -67,8 +67,28 @@ export interface PolicyMeta {
   /** 보충 설명 */
   note?: string;
 
-  /** 재검증 트리거. 예: "가계부채 관리방안 발표 시", "금통위 후" */
+  /**
+   * 사람이 읽는 재검증 트리거. 예: "가계부채 관리방안 발표 시", "금통위 후"
+   *
+   * ⚠️ 기계 판정에는 쓰지 않는다. 자동 점검이 필요하면 reviewBy 를 함께 적는다.
+   */
   nextReviewHint?: string;
+
+  /**
+   * 기계 판독용 검토 기한 (YYYY-MM-DD).
+   *
+   * 이 날짜가 지나면 개발 단계에서 경고한다. **계산을 막지는 않는다.**
+   * 검증일이 오래됐다는 사실만으로 정책값이 틀렸다고 볼 수 없기 때문이다.
+   *
+   * ⚠️ effectiveUntil 과 다르다.
+   *     effectiveUntil — 정책의 **효력**이 끝나는 날. 지나면 계산이 위험해진다.
+   *     reviewBy       — 사람이 원문을 **다시 확인**하기로 한 날. 지나도 값은
+   *                      대개 유효하다. 확인하지 않았다는 사실만 알린다.
+   *
+   * 효력 만료로 계산을 막아야 하는 항목은 reviewBy 가 아니라 각 엔진의
+   * 런타임 unsupported 처리로 다룬다. (예: 지방 주담대 유예 만료)
+   */
+  reviewBy?: string;
 }
 
 // ─────────────────────────────────────────────
@@ -157,6 +177,9 @@ export function validatePolicyMeta(meta: PolicyMeta): string[] {
   if (!ISO_DATE.test(meta.verifiedAt ?? ""))
     problems.push("verifiedAt 이 YYYY-MM-DD 형식이 아닙니다.");
 
+  if (meta.reviewBy !== undefined && !ISO_DATE.test(meta.reviewBy))
+    problems.push("reviewBy 가 YYYY-MM-DD 형식이 아닙니다.");
+
   if (meta.effectiveUntil !== undefined) {
     if (!ISO_DATE.test(meta.effectiveUntil))
       problems.push("effectiveUntil 이 YYYY-MM-DD 형식이 아닙니다.");
@@ -175,9 +198,12 @@ export function validatePolicyMeta(meta: PolicyMeta): string[] {
   if (!meta.sources?.length) problems.push("sources 가 최소 1건 필요합니다.");
   else
     meta.sources.forEach((s, i) => {
-      if (!s.name?.trim()) problems.push(`sources[${i}].name 이 비어 있습니다.`);
+      if (!s.name?.trim())
+        problems.push(`sources[${i}].name 이 비어 있습니다.`);
       if (s.publishedAt !== undefined && !ISO_DATE.test(s.publishedAt))
-        problems.push(`sources[${i}].publishedAt 이 YYYY-MM-DD 형식이 아닙니다.`);
+        problems.push(
+          `sources[${i}].publishedAt 이 YYYY-MM-DD 형식이 아닙니다.`,
+        );
     });
 
   if (!meta.supported?.length)
@@ -195,6 +221,7 @@ export function formatPolicyStamp(meta: PolicyMeta): string {
     `최종 확인 ${meta.verifiedAt}`,
     `출처 ${meta.sources.map((s) => s.name).join(", ")}`,
   ];
-  if (meta.effectiveUntil) parts.splice(1, 0, `적용 종료 ${meta.effectiveUntil}`);
+  if (meta.effectiveUntil)
+    parts.splice(1, 0, `적용 종료 ${meta.effectiveUntil}`);
   return parts.join(" · ");
 }

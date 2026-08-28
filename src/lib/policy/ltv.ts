@@ -16,7 +16,8 @@ import type { PolicyMeta, PolicyTable } from "@/lib/policy/types";
 // ─────────────────────────────────────────────
 
 /** 규제지역 / 수도권 비규제 / 비수도권 비규제 */
-export type LtvRegion = "regulated" | "metroUnregulated" | "nonMetroUnregulated";
+export type LtvRegion =
+  "regulated" | "metroUnregulated" | "nonMetroUnregulated";
 
 /** 무주택(처분조건부 1주택 포함) / 생애최초 / 유주택(1주택 비처분·다주택) */
 export type BorrowerType = "noHouse" | "firstTime" | "owner";
@@ -83,6 +84,8 @@ const LTV_META: PolicyMeta = {
   ],
   note: "처분조건부 1주택자는 무주택자와 동일하게 적용합니다.",
   nextReviewHint: "가계부채 관리방안 발표 시 / 부동산 대책 발표 시",
+  // 가계부채 관리방안은 통상 연 1회 발표된다. 반년 주기로 원문을 다시 본다.
+  reviewBy: "2027-02-28",
 };
 
 /** 조건 → LTV 비율(%). 앞에 올수록 우선하지만 9개 조합이 모두 명시되어 있어 순서 의존이 없습니다. */
@@ -94,13 +97,28 @@ export const LTV_TABLE: PolicyTable<LtvCondition, number> = {
     { conditions: { region: "regulated", borrower: "firstTime" }, value: 70 },
     { conditions: { region: "regulated", borrower: "owner" }, value: 0 },
     // 수도권 비규제 — 유주택 0%는 금융위 2025년 가계부채 관리 강화 방안 근거
-    { conditions: { region: "metroUnregulated", borrower: "noHouse" }, value: 70 },
-    { conditions: { region: "metroUnregulated", borrower: "firstTime" }, value: 70 },
+    {
+      conditions: { region: "metroUnregulated", borrower: "noHouse" },
+      value: 70,
+    },
+    {
+      conditions: { region: "metroUnregulated", borrower: "firstTime" },
+      value: 70,
+    },
     { conditions: { region: "metroUnregulated", borrower: "owner" }, value: 0 },
     // 비수도권 비규제
-    { conditions: { region: "nonMetroUnregulated", borrower: "noHouse" }, value: 70 },
-    { conditions: { region: "nonMetroUnregulated", borrower: "firstTime" }, value: 80 },
-    { conditions: { region: "nonMetroUnregulated", borrower: "owner" }, value: 60 },
+    {
+      conditions: { region: "nonMetroUnregulated", borrower: "noHouse" },
+      value: 70,
+    },
+    {
+      conditions: { region: "nonMetroUnregulated", borrower: "firstTime" },
+      value: 80,
+    },
+    {
+      conditions: { region: "nonMetroUnregulated", borrower: "owner" },
+      value: 60,
+    },
   ],
 };
 
@@ -128,9 +146,13 @@ export const ABSOLUTE_CAP_META: PolicyMeta = {
     },
   ],
   supported: ["수도권·규제지역의 주택구입 목적 주택담보대출"],
-  unsupported: ["비수도권 비규제지역(절대한도 자체가 없음)", "생활안정자금 목적 대출"],
+  unsupported: [
+    "비수도권 비규제지역(절대한도 자체가 없음)",
+    "생활안정자금 목적 대출",
+  ],
   note: "LTV 한도와 중첩 적용되며, 차감을 마친 대출 실행액에 걸립니다.",
   nextReviewHint: "대출한도 정책 변경 시",
+  reviewBy: "2027-02-28",
 };
 
 /** 절대한도 구간 (원). 경계는 이하/초과 기준. */
@@ -201,6 +223,7 @@ export const ROOM_DEDUCTION_META: PolicyMeta = {
     "현행 시행령 버전은 대통령령 제36423호(시행 2026-07-01)이나, 제10조·제11조 금액은 " +
     "2023-02-21 개정값이 유지되고 있다. effectiveFrom 은 법령 버전이 아니라 금액의 적용 시작일이다.",
   nextReviewHint: "주택임대차보호법 시행령 제10조·제11조 금액 개정 시",
+  reviewBy: "2027-08-28",
 };
 
 /** 지역별 최우선변제금(원) — 참고값 */
