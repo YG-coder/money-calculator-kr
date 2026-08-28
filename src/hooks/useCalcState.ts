@@ -23,6 +23,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   sanitize,
   toDisplay,
+  readUrlValue,
   type CalcState,
   type FieldKind,
   type FieldState,
@@ -30,7 +31,13 @@ import {
 
 // 기존 사용처 호환을 위한 re-export (파싱·읽기 유틸의 정본은 @/lib/calcInput)
 export type { CalcState, FieldKind, FieldState };
-export { readRaw, readNum, readWon, isFilled } from "@/lib/calcInput";
+export {
+  readRaw,
+  readNum,
+  readWon,
+  isFilled,
+  isValidUrlValue,
+} from "@/lib/calcInput";
 
 export type FieldDef = {
   key: string;
@@ -57,7 +64,12 @@ export function useCalcState(fields: FieldDef[]) {
 
     for (const f of fields) {
       const kind = getKind(f);
-      const rawFromUrl = searchParams?.get(f.key) ?? f.defaultValue;
+      // 유효하지 않은 쿼리값(음수·문자·지수표기 등)은 무시하고 기본값을 쓴다
+      const rawFromUrl = readUrlValue(
+        searchParams?.get(f.key),
+        f.defaultValue,
+        kind,
+      );
       const raw = sanitize(rawFromUrl, kind);
       const error = f.validate ? (f.validate(raw) ?? "") : "";
 
@@ -93,7 +105,7 @@ export function useCalcState(fields: FieldDef[]) {
       for (const f of fields) {
         const kind = getKind(f);
         const urlRaw = sanitize(
-          searchParams?.get(f.key) ?? f.defaultValue,
+          readUrlValue(searchParams?.get(f.key), f.defaultValue, kind),
           kind,
         );
         const error = f.validate ? (f.validate(urlRaw) ?? "") : "";

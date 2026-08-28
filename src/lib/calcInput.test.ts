@@ -7,6 +7,8 @@ import {
   readWon,
   isFilled,
   type CalcState,
+  isValidUrlValue,
+  readUrlValue,
 } from "@/lib/calcInput";
 
 const st = (entries: Record<string, string>): CalcState =>
@@ -151,5 +153,45 @@ describe("stale 입력 재현 — 왜 read 유틸이 필요한가", () => {
     const initial = st({ price: "1000" });
     expect(r.readDuringRender("price")).toBe(0); // ❌
     expect(readNum(initial, "price")).toBe(1000); // ✅
+  });
+});
+
+describe("isValidUrlValue — 잘못된 쿼리값 무시", () => {
+  it("정상 숫자는 통과한다", () => {
+    expect(isValidUrlValue("5000", "money")).toBe(true);
+    expect(isValidUrlValue("5,000", "money")).toBe(true);
+    expect(isValidUrlValue(" 5000 ", "money")).toBe(true);
+    expect(isValidUrlValue("0", "money")).toBe(true);
+  });
+
+  it("음수는 무시한다 — sanitize 만으로는 부호가 떨어져 양수가 된다", () => {
+    expect(sanitize("-5000", "money")).toBe("5000"); // 기존 동작 확인
+    expect(isValidUrlValue("-5000", "money")).toBe(false);
+  });
+
+  it("문자·지수표기·특수값은 무시한다", () => {
+    for (const bad of ["abc", "1e5", "NaN", "Infinity", "5000원", "", "  "]) {
+      expect(isValidUrlValue(bad, "money")).toBe(false);
+    }
+  });
+
+  it("소수 필드는 소수를 허용하고 정수 필드는 허용하지 않는다", () => {
+    expect(isValidUrlValue("4.5", "decimal")).toBe(true);
+    expect(isValidUrlValue("4.5", "money")).toBe(false);
+    expect(isValidUrlValue("4.5", "integer")).toBe(false);
+    expect(isValidUrlValue("4.5.6", "decimal")).toBe(false);
+  });
+});
+
+describe("readUrlValue — 무시할 때 기본값으로 되돌린다", () => {
+  it("유효하면 그 값을, 아니면 fallback 을 준다", () => {
+    expect(readUrlValue("5000", "0", "money")).toBe("5000");
+    expect(readUrlValue("-5000", "0", "money")).toBe("0");
+    expect(readUrlValue("abc", "", "money")).toBe("");
+  });
+
+  it("파라미터 자체가 없으면 fallback", () => {
+    expect(readUrlValue(null, "0", "money")).toBe("0");
+    expect(readUrlValue(undefined, "", "money")).toBe("");
   });
 });

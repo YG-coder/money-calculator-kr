@@ -40,6 +40,43 @@ export function sanitize(input: string, kind: FieldKind): string {
   return `${parts[0]}.${parts.slice(1).join("")}`;
 }
 
+/**
+ * URL 쿼리로 들어온 값이 이 필드에 넣어도 되는 값인지 판정한다.
+ *
+ * ⚠️ sanitize() 는 "입력 도중"을 다루는 함수라서 허용 문자만 남긴다.
+ *    그래서 URL 로 "-5000" 이 들어오면 부호가 떨어져 나가 5000 이 된다.
+ *    사용자가 타이핑으로는 만들 수 없는 값이지만 URL 로는 만들 수 있고,
+ *    음수를 양수로 바꿔 계산하는 것은 조용한 오답이다.
+ *
+ *    따라서 URL 에서 읽을 때는 sanitize 전에 이 검사를 먼저 통과시키고,
+ *    통과하지 못하면 그 파라미터를 **무시**한다(=필드 기본값을 쓴다).
+ *
+ * 허용: "5000", "5,000", " 5000 ", 소수 필드의 "4.5"
+ * 무시: "-5000", "abc", "1e5", "NaN", "Infinity", "4.5"(정수 필드), ""
+ */
+export function isValidUrlValue(input: string, kind: FieldKind): boolean {
+  const value = input.replace(/,/g, "").trim();
+  if (!value) return false;
+
+  const pattern = kind === "decimal" ? /^\d+(\.\d+)?$/ : /^\d+$/;
+  if (!pattern.test(value)) return false;
+
+  return Number.isFinite(Number(value));
+}
+
+/**
+ * URL 파라미터 하나를 읽는다. 값이 없거나 유효하지 않으면 fallback 을 돌려준다.
+ * 반환값은 아직 sanitize 전 문자열이다.
+ */
+export function readUrlValue(
+  urlValue: string | null | undefined,
+  fallback: string,
+  kind: FieldKind,
+): string {
+  if (urlValue == null) return fallback;
+  return isValidUrlValue(urlValue, kind) ? urlValue : fallback;
+}
+
 /** raw 문자열 → 화면 표시 문자열. 입력 도중의 "1234." / "1234.50" 형태를 보존한다. */
 export function toDisplay(raw: string, kind: FieldKind): string {
   if (!raw) return "";
