@@ -3,163 +3,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildMetadata } from "@/lib/metadata";
 import { blogPosts } from "@/data/blogPosts";
+import {
+  CALC,
+  PURPOSE_GROUPS,
+  MONEY_FLOW,
+  CATEGORY_HUBS,
+  type CalcKey,
+} from "@/data/homeNav";
 
 export const metadata: Metadata = buildMetadata({
-  title: "머니계산기 | 대출·부동산·예금·적금 무료 금융 계산기",
+  title: "머니계산기 | DSR·LTV·실투자금·대출·부동산·예적금 계산기",
   description:
-    "대출이자·원리금·전세대출·중도상환·취득세·월세 vs 전세·예금·적금·복리 계산기를 무료로 이용하세요. 복잡한 금융·부동산 계산을 쉽고 빠르게.",
+    "DSR·LTV로 대출 한도를, 실투자금·취득세로 주택 구입에 필요한 현금을, 임대수익률로 투자 결과를 계산합니다. 대출이자·전세와 월세·예금·적금·환전까지 27개 계산기를 무료로 이용하세요.",
 });
-
-const QUICK_CALCS = [
-  {
-    title: "대출이자 계산기",
-    desc: "대출 원금·금리·기간으로 월 이자와 총 이자를 바로 계산",
-    href: "/loan-interest-calculator",
-    icon: "🏦",
-    badge: "인기",
-  },
-  {
-    title: "원리금상환 계산기",
-    desc: "월 상환액과 총 이자를 상환 방식별로 비교",
-    href: "/amortization-calculator",
-    icon: "📊",
-    badge: "추천",
-  },
-  {
-    title: "취득세 계산기",
-    desc: "주택 취득 시 예상 세금을 빠르게 계산",
-    href: "/real-estate/acquisition-tax-calculator",
-    icon: "🏠",
-    badge: "신규",
-  },
-  {
-    title: "월세 vs 전세 계산기",
-    desc: "전세와 월세의 실질 비용을 비교",
-    href: "/real-estate/jeonse-vs-wolse-calculator",
-    icon: "⚖️",
-    badge: "신규",
-  },
-];
-
-const POPULAR = [
-  {
-    title: "대출이자 계산기",
-    desc: "원금·금리·기간으로 월 이자, 총 이자를 즉시 계산",
-    href: "/loan-interest-calculator",
-    icon: "🏦",
-    badge: "인기",
-  },
-  {
-    title: "취득세 계산기",
-    desc: "주택 취득세·농특세·지방교육세를 한번에 계산",
-    href: "/real-estate/acquisition-tax-calculator",
-    icon: "🏠",
-    badge: "신규",
-  },
-  {
-    title: "월세 vs 전세 계산기",
-    desc: "전세 vs 월세 실질 비용을 기회비용 기준으로 비교",
-    href: "/real-estate/jeonse-vs-wolse-calculator",
-    icon: "⚖️",
-    badge: "신규",
-  },
-  {
-    title: "원리금상환 계산기",
-    desc: "균등·원금 방식 비교, 월별 상환 스케줄 확인",
-    href: "/amortization-calculator",
-    icon: "📊",
-    badge: null,
-  },
-];
-
-const LOAN_CALCS = [
-  {
-    title: "대출이자 계산기",
-    desc: "원금·금리·기간으로 월 이자, 총 이자를 즉시 계산",
-    href: "/loan-interest-calculator",
-    icon: "🏦",
-  },
-  {
-    title: "원리금상환 계산기",
-    desc: "균등·원금 방식 비교, 월별 상환 스케줄 확인",
-    href: "/amortization-calculator",
-    icon: "📊",
-  },
-  {
-    title: "전세대출 계산기",
-    desc: "대출 한도·월 이자·DTI 비율 한번에 계산",
-    href: "/jeonse-loan-calculator",
-    icon: "🏠",
-  },
-  {
-    title: "중도상환 계산기",
-    desc: "수수료 제하고 실질 이득이 있는지 확인",
-    href: "/prepayment-calculator",
-    icon: "💸",
-  },
-];
-
-const REALESTATE_CALCS = [
-  {
-    title: "취득세 계산기",
-    desc: "주택 가격·보유 수에 따른 취득세·농특세·지방교육세 계산",
-    href: "/real-estate/acquisition-tax-calculator",
-    icon: "🏠",
-    badge: "신규",
-  },
-  {
-    title: "월세 vs 전세 계산기",
-    desc: "전세 보증금 기회비용 vs 월세 실질 비용 비교",
-    href: "/real-estate/jeonse-vs-wolse-calculator",
-    icon: "⚖️",
-    badge: "신규",
-  },
-  {
-    title: "부동산 수익률 계산기",
-    desc: "매입가·보증금·월세·대출 이자를 반영해 월 순수익과 수익률 계산",
-    href: "/real-estate/property-yield-calculator",
-    icon: "📈",
-    badge: "신규",
-  },
-  {
-    title: "재건축 분담금 계산기",
-    desc: "권리가액·종후자산가액·비례율 기준 예상 분담금 계산",
-    href: "/real-estate/reconstruction-contribution-calculator",
-    icon: "🏗️",
-    badge: "신규",
-  },
-];
-
-const FINANCE_CALCS = [
-  {
-    title: "예금 이자 계산기",
-    desc: "예치금·금리·기간으로 세전·세후 이자와 만기 수령액 계산",
-    href: "/finance/deposit",
-    icon: "🏦",
-    badge: "신규",
-  },
-  {
-    title: "적금 이자 계산기",
-    desc: "월 납입액 기준 총 납입액·예상 이자·만기 수령액 계산",
-    href: "/finance/installment-savings",
-    icon: "🪙",
-    badge: "신규",
-  },
-  {
-    title: "복리 계산기",
-    desc: "원금·월 추가 납입·기간별 복리 증가액과 최종 금액 계산",
-    href: "/finance/compound",
-    icon: "📈",
-    badge: "신규",
-  },
-  {
-    title: "목표 저축 계산기",
-    desc: "목표금액·월납입·기간 중 둘을 정하면 나머지를 역산",
-    href: "/finance/goal-savings",
-    icon: "🎯",
-    badge: "신규",
-  },
-];
 
 const latestPosts = blogPosts
   .filter((post) => post.published !== false)
@@ -167,53 +23,51 @@ const latestPosts = blogPosts
 
 const HOME_FAQ = [
   {
+    q: "무엇부터 계산해야 하나요?",
+    a: "목적에 따라 다릅니다. 대출을 앞두고 있다면 DSR로 소득 기준 한도를, 주택 담보라면 LTV로 담보 기준 한도를 먼저 봅니다. 실제 한도는 두 값 중 낮은 쪽으로 정해집니다. 매수를 검토 중이라면 실투자금 계산기로 매매가 외에 필요한 현금을 확인하는 편이 빠릅니다.",
+  },
+  {
     q: "계산 결과가 실제 은행과 다를 수 있나요?",
-    a: "네, 본 계산기는 참고용이며 실제 금융 상품과 차이가 있을 수 있습니다. 우대금리, 가산금리, 수수료 등이 은행마다 다르므로 최종 결정 전 반드시 해당 금융기관에 확인하세요.",
+    a: "네. 이 사이트의 결과는 참고용 추정치입니다. 우대금리·가산금리·수수료와 금융회사 내부 심사 기준이 반영되지 않으므로 최종 결정 전 해당 금융기관에 확인하세요. 특히 대출 한도는 소득 인정 방식과 기존 부채 산정 방식에 따라 달라집니다.",
   },
   {
-    q: "입력 데이터가 저장되나요?",
-    a: "아니요. 계산기에 입력한 수치는 서버로 전송되지 않으며 브라우저에서만 처리됩니다. 입력값은 URL 파라미터에만 저장되어 공유가 편리합니다.",
+    q: "입력한 값이 저장되나요?",
+    a: "서버로 전송되거나 저장되지 않습니다. 모든 계산은 브라우저에서 처리됩니다. 입력값은 주소창의 쿼리 파라미터에만 담기므로, 링크를 복사하면 같은 조건을 다시 열 수 있습니다.",
   },
   {
-    q: "모바일에서도 사용 가능한가요?",
-    a: "네, 모든 계산기는 모바일·태블릿·PC에서 동일하게 이용할 수 있습니다.",
-  },
-  {
-    q: "어떤 계산기를 먼저 써볼까요?",
-    a: "주택담보대출이나 신용대출 계획 중이라면 대출이자 계산기 → 원리금상환 계산기 순서로 이용하시면 됩니다. 부동산 매매를 앞두고 있다면 취득세 계산기, 전세·월세를 비교하고 싶다면 월세 vs 전세 계산기를 먼저 사용해 보세요.",
+    q: "세율이나 규제 수치는 언제 기준인가요?",
+    a: "정책을 쓰는 계산기는 결과 아래에 기준일·검증일·출처를 함께 표시합니다. 확인되지 않은 조건 조합은 임의로 계산하지 않고 '지원하지 않음'으로 알리며, 적용 기간이 끝난 정책값은 새 기준을 확인하기 전까지 계산하지 않습니다.",
   },
 ];
 
-function CalcCard({
-  title,
-  desc,
-  href,
-  icon,
-  badge,
-}: {
-  title: string;
-  desc: string;
-  href: string;
-  icon: string;
-  badge?: string | null;
-}) {
+function CalcCard({ calc }: { calc: CalcKey }) {
+  const c = CALC[calc];
   return (
     <Link
-      href={href}
-      className="group rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-200 hover:border-brand-200 hover:shadow-md"
+      href={c.href}
+      className="group flex flex-col rounded-xl border border-slate-200 bg-white p-5 transition-colors hover:border-brand-300 hover:bg-brand-50/40"
     >
-      <div className="mb-3 flex items-start justify-between">
-        <span className="text-3xl">{icon}</span>
-        {badge && (
-          <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-bold text-brand-700">
-            {badge}
-          </span>
-        )}
-      </div>
-      <h3 className="mb-1.5 font-black text-slate-900 transition-colors group-hover:text-brand-600">
-        {title}
-      </h3>
-      <p className="text-sm leading-relaxed text-slate-500">{desc}</p>
+      <span className="font-bold text-slate-900 transition-colors group-hover:text-brand-700">
+        {c.title}
+      </span>
+      <span className="mt-1.5 text-sm leading-relaxed text-slate-600">
+        {c.desc}
+      </span>
+      <span className="mt-3 text-sm font-semibold text-brand-600">
+        계산하기 →
+      </span>
+    </Link>
+  );
+}
+
+function CalcChip({ calc }: { calc: CalcKey }) {
+  const c = CALC[calc];
+  return (
+    <Link
+      href={c.href}
+      className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 transition-colors hover:border-brand-300 hover:text-brand-700"
+    >
+      {c.title}
     </Link>
   );
 }
@@ -221,222 +75,334 @@ function CalcCard({
 export default function Page() {
   return (
     <>
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-600 via-brand-600 to-brand-700 px-4 py-16 text-white">
-        <div className="mx-auto max-w-4xl text-center">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-200">
+      {/* ── Hero ── */}
+      <section className="border-b border-slate-200 bg-brand-700 px-4 py-14 text-white sm:py-16">
+        <div className="mx-auto max-w-3xl">
+          <p className="mb-3 text-sm font-semibold tracking-wide text-brand-200">
             무료 금융·부동산 계산기
           </p>
-          <h1 className="mb-4 text-3xl font-black leading-tight md:text-5xl">
-            복잡한 금융 계산,
-            <br />
-            쉽고 빠르게
+          <h1 className="mb-4 text-3xl font-black leading-tight md:text-4xl">
+            금융 결정을 숫자로 먼저 확인하세요
           </h1>
-          <p className="mx-auto mb-8 max-w-xl text-base text-brand-100 md:text-xl">
-            대출이자·원리금·전세대출·중도상환·취득세·월세 vs 전세 계산을 무료로.
-            <br className="hidden md:block" />
-            입력하면 즉시 결과를 확인할 수 있어요.
+          <p className="mb-7 max-w-2xl text-base leading-relaxed text-brand-100">
+            빌릴 수 있는 금액, 집을 살 때 실제로 필요한 현금, 저축과 환전까지.
+            조건을 입력하면 근거를 함께 보여 줍니다. 회원가입이 없고 입력값은
+            브라우저에서만 처리됩니다.
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-wrap gap-3">
             <Link
-              href="/loan-interest-calculator"
-              className="rounded-xl bg-white px-6 py-3 font-bold text-brand-700 shadow-lg transition hover:bg-brand-50"
+              href="#start"
+              className="rounded-xl bg-white px-5 py-3 font-bold text-brand-700 transition-colors hover:bg-brand-50"
             >
-              대출이자 계산하기 →
+              목적부터 고르기 ↓
             </Link>
             <Link
-              href="/real-estate/acquisition-tax-calculator"
-              className="rounded-xl border border-brand-400 bg-brand-500 px-6 py-3 font-bold text-white transition hover:bg-brand-400"
+              href="#flow"
+              className="rounded-xl border border-brand-400 px-5 py-3 font-bold text-white transition-colors hover:bg-brand-600"
             >
-              취득세 계산하기 →
+              주택 구입 자금 흐름 보기
             </Link>
           </div>
         </div>
       </section>
 
-      {/* 빠른 실행 */}
-      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <h2 className="text-xl font-black text-slate-800">
-            지금 바로 계산하기
+      {/* ── 목적별 시작 ── */}
+      <section id="start" className="scroll-mt-16 bg-slate-50 py-14">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <h2 className="text-2xl font-black text-slate-900">
+            어떤 상황이신가요?
           </h2>
-          <p className="mt-1 text-sm text-slate-500">
-            가장 많이 찾는 계산기를 빠르게 이용해보세요.
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+            상황에 맞는 시작점을 골라 보세요. 각 묶음의 첫 계산기부터 쓰면
+            나머지는 자연스럽게 이어집니다.
+          </p>
+
+          <div className="mt-8 space-y-6">
+            {PURPOSE_GROUPS.map((g) => (
+              <div
+                key={g.id}
+                className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7"
+              >
+                <h3 className="text-lg font-black text-slate-900">{g.title}</h3>
+                <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-600">
+                  {g.when}
+                </p>
+
+                <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {g.cards.map((k) => (
+                    <CalcCard key={k} calc={k} />
+                  ))}
+                </div>
+
+                <div className="mt-5 border-t border-slate-100 pt-4">
+                  <p className="mb-2.5 text-xs font-semibold text-slate-500">
+                    같은 상황에서 함께 쓰는 계산기
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {g.more.map((k) => (
+                      <CalcChip key={k} calc={k} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 부동산 자금 흐름 ── */}
+      <section
+        id="flow"
+        className="scroll-mt-16 border-t border-slate-200 py-14"
+      >
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <h2 className="text-2xl font-black text-slate-900">
+            주택 구입은 네 단계로 나눠 계산합니다
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+            한도 · 필요 현금 · 수익률은 서로 다른 질문입니다. 순서대로 확인하면
+            어디서 막히는지 분명해집니다.
+          </p>
+
+          <ol className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-4">
+            {MONEY_FLOW.map((s) => (
+              <li
+                key={s.step}
+                className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-black text-white">
+                    {s.step}
+                  </span>
+                  <span className="text-sm font-bold text-slate-500">
+                    {s.headline}
+                  </span>
+                </div>
+
+                <Link
+                  href={CALC[s.calc].href}
+                  className="mt-3 font-black text-slate-900 underline-offset-4 hover:text-brand-700 hover:underline"
+                >
+                  {CALC[s.calc].title}
+                </Link>
+                <p className="mt-1.5 grow text-sm leading-relaxed text-slate-600">
+                  {s.detail}
+                </p>
+
+                {s.handoff && (
+                  <p className="mt-3 border-t border-slate-100 pt-3 text-xs leading-relaxed text-slate-500">
+                    <span aria-hidden="true">↓ </span>
+                    {s.handoff}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ol>
+
+          <p className="mt-5 text-xs leading-relaxed text-slate-500">
+            ※ 값이 이어지는 구간은 2→3, 3→4 입니다. 넘어온 값은 다음 화면에서
+            수정할 수 있고, 방공제·등기비용처럼 직접 골라야 하는 항목은 자동으로
+            선택되지 않습니다.
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {QUICK_CALCS.map((c) => (
-            <CalcCard key={c.href} {...c} />
-          ))}
-        </div>
       </section>
 
-      {/* 인기 계산기 */}
-      <section className="border-t border-slate-100 bg-slate-50 py-14">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <h2 className="mb-6 text-xl font-black text-slate-800">
-            인기 계산기
-          </h2>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {POPULAR.map((c) => (
-              <CalcCard key={c.href} {...c} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 대출 계산기 섹션 */}
-      <section className="py-14">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-6">
-            <h2 className="text-xl font-black text-slate-800">대출 계산기</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              대출 조건을 입력하고 월 상환액과 총 이자를 확인하세요
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {LOAN_CALCS.map((c) => (
-              <CalcCard key={c.href} {...c} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 부동산 계산기 섹션 */}
-      <section className="border-t border-slate-100 bg-slate-50 py-14">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-6">
-            <h2 className="text-xl font-black text-slate-800">부동산 계산기</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              매매·임대 의사결정에 필요한 부동산 계산기
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {REALESTATE_CALCS.map((c) => (
-              <CalcCard key={c.href} {...c} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 금융 계산기 섹션 */}
-      <section className="py-14">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-6">
-            <h2 className="text-xl font-black text-slate-800">금융 계산기</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              예금·적금 이자와 장기 복리 효과를 세전·세후 기준으로 확인하세요
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {FINANCE_CALCS.map((c) => (
-              <CalcCard key={c.href} {...c} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 최신 금융 가이드 */}
-      <section className="py-14">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-xl font-black text-slate-800">
-              최신 금융 가이드
-            </h2>
+      {/* ── 금융 가이드 ── */}
+      <section className="border-t border-slate-200 bg-slate-50 py-14">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900">
+                금융 가이드
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                계산기가 내놓은 숫자를 어떻게 읽어야 하는지 정리했습니다.
+              </p>
+            </div>
             <Link
               href="/blog"
-              className="text-sm font-semibold text-brand-600 hover:underline"
+              className="shrink-0 text-sm font-bold text-brand-600 hover:text-brand-700"
             >
               전체 보기 →
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {latestPosts.map((post) => (
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className="group rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-200 hover:border-brand-200 hover:shadow-md"
+                className="group rounded-2xl border border-slate-200 bg-white p-5 transition-colors hover:border-brand-300"
               >
-                <span className="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-bold text-brand-600">
+                <span className="text-xs font-bold text-brand-600">
                   {post.category}
                 </span>
-                <h3 className="mt-3 mb-1.5 text-sm font-bold leading-snug text-slate-900 transition-colors group-hover:text-brand-600">
+                <h3 className="mt-2 font-bold leading-snug text-slate-900 transition-colors group-hover:text-brand-700">
                   {post.title}
                 </h3>
-                <p className="mb-3 text-xs leading-relaxed text-slate-500">
+                <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-600">
                   {post.description}
                 </p>
-                <p className="text-xs text-slate-300">{post.date}</p>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 홈 FAQ */}
-      <section className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
-        <h2 className="mb-6 text-xl font-black text-slate-800">
-          자주 묻는 질문
-        </h2>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              mainEntity: HOME_FAQ.map((f) => ({
-                "@type": "Question",
-                name: f.q,
-                acceptedAnswer: { "@type": "Answer", text: f.a },
-              })),
-            }),
-          }}
-        />
-        <div className="space-y-3">
-          {HOME_FAQ.map((item, i) => (
-            <details
-              key={i}
-              className="group overflow-hidden rounded-xl border border-slate-100 bg-white"
-            >
-              <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-sm font-semibold text-slate-800 transition-colors hover:bg-slate-50">
-                <span>Q. {item.q}</span>
-                <svg
-                  className="ml-3 h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </summary>
-              <div className="border-t border-slate-50 px-5 pt-3 pb-4 text-sm leading-relaxed text-slate-600">
-                {item.a}
-              </div>
-            </details>
-          ))}
-        </div>
-      </section>
+      {/* ── 전체 계산기 찾기 ── */}
+      <section className="border-t border-slate-200 py-14">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <h2 className="text-2xl font-black text-slate-900">
+            전체 계산기 둘러보기
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+            카테고리별 목록에서 나머지 계산기를 찾을 수 있습니다.
+          </p>
 
-      {/* 신뢰 안내 */}
-      <section className="py-10">
-        <div className="mx-auto max-w-2xl px-4">
-          <div className="rounded-2xl border border-slate-100 bg-white p-6 text-center shadow-sm">
-            <p className="mb-2 text-xs text-slate-400">🔒 개인정보 보호</p>
-            <p className="text-sm font-semibold text-slate-800">
-              입력한 계산 값은 서버에 저장되지 않습니다
-            </p>
-            <p className="mt-1 text-xs text-slate-500">
-              모든 계산은 브라우저에서 바로 처리되며 별도의 회원가입 없이 이용할
-              수 있습니다.
-            </p>
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {CATEGORY_HUBS.map((h) => (
+              <Link
+                key={h.href}
+                href={h.href}
+                className="group rounded-2xl border border-slate-200 bg-white p-5 transition-colors hover:border-brand-300 hover:bg-brand-50/40"
+              >
+                <div className="flex items-baseline justify-between">
+                  <span className="font-black text-slate-900 transition-colors group-hover:text-brand-700">
+                    {h.title}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-400">
+                    {h.count}개
+                  </span>
+                </div>
+                <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
+                  {h.desc}
+                </p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
+
+      {/* ── FAQ ── */}
+      <section className="border-t border-slate-200 py-14">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <h2 className="mb-6 text-2xl font-black text-slate-900">
+            자주 묻는 질문
+          </h2>
+          <div className="divide-y divide-slate-200 border-y border-slate-200">
+            {HOME_FAQ.map((f) => (
+              <details key={f.q} className="group py-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-bold text-slate-900">
+                  {f.q}
+                  <span
+                    aria-hidden="true"
+                    className="shrink-0 text-slate-400 transition-transform group-open:rotate-45"
+                  >
+                    +
+                  </span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                  {f.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 신뢰·정책 안내 ── */}
+      <section className="border-t border-slate-200 bg-slate-900 py-14 text-slate-300">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <h2 className="text-2xl font-black text-white">
+            숫자를 어떻게 관리하는지
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-400">
+            금융 계산은 근거가 없으면 의미가 없습니다. 이 사이트가 지키는
+            원칙입니다.
+          </p>
+
+          <dl className="mt-8 grid grid-cols-1 gap-x-8 gap-y-7 sm:grid-cols-2">
+            <div>
+              <dt className="font-bold text-white">1차 출처를 우선합니다</dt>
+              <dd className="mt-1.5 text-sm leading-relaxed text-slate-400">
+                세율과 규제 수치는 법령·정부 부처 발표 원문을 우선 확인합니다.
+                원문을 확인하지 못한 값은 근거 등급을 함께 밝힙니다.
+              </dd>
+            </div>
+            <div>
+              <dt className="font-bold text-white">
+                기준일과 검증일을 밝힙니다
+              </dt>
+              <dd className="mt-1.5 text-sm leading-relaxed text-slate-400">
+                정책을 쓰는 계산기는 결과 아래에 적용 기준일, 마지막 확인 날짜,
+                출처를 함께 표시합니다.
+              </dd>
+            </div>
+            <div>
+              <dt className="font-bold text-white">
+                확인되지 않은 조건은 계산하지 않습니다
+              </dt>
+              <dd className="mt-1.5 text-sm leading-relaxed text-slate-400">
+                근거가 없는 조건 조합은 값을 추정하지 않고 지원하지 않는다고
+                알립니다. 적용 기간이 끝난 정책값도 새 기준을 확인하기 전까지
+                계산하지 않습니다.
+              </dd>
+            </div>
+            <div>
+              <dt className="font-bold text-white">
+                입력값은 서버에 저장되지 않습니다
+              </dt>
+              <dd className="mt-1.5 text-sm leading-relaxed text-slate-400">
+                모든 계산은 브라우저에서 처리됩니다. 입력값은 주소창의 쿼리
+                파라미터에만 담겨, 링크를 복사하면 같은 조건을 다시 열 수
+                있습니다.
+              </dd>
+            </div>
+          </dl>
+
+          <p className="mt-8 border-t border-slate-700 pt-6 text-sm leading-relaxed text-slate-400">
+            모든 결과는{" "}
+            <strong className="text-slate-200">참고용 예상값</strong>
+            입니다. 법률·세무·금융 판단을 대신하지 않으며, 실제 조건은
+            금융기관·세무 전문가의 확인이 필요합니다.{" "}
+            <Link
+              href="/disclaimer"
+              className="font-semibold text-brand-300 underline underline-offset-2 hover:text-brand-200"
+            >
+              면책 고지
+            </Link>
+            {" · "}
+            <Link
+              href="/about"
+              className="font-semibold text-brand-300 underline underline-offset-2 hover:text-brand-200"
+            >
+              사이트 소개
+            </Link>
+            {" · "}
+            <Link
+              href="/contact"
+              className="font-semibold text-brand-300 underline underline-offset-2 hover:text-brand-200"
+            >
+              문의
+            </Link>
+          </p>
+        </div>
+      </section>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: HOME_FAQ.map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: { "@type": "Answer", text: f.a },
+            })),
+          }),
+        }}
+      />
     </>
   );
 }
