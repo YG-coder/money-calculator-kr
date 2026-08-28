@@ -5,14 +5,10 @@ import { notFound } from "next/navigation";
 import { buildMetadata, BASE_URL, SITE_NAME, SITE_AUTHOR } from "@/lib/metadata";
 import { blogPosts } from "@/data/blogPosts";
 import BlogContent from "@/components/blog/BlogContent";
+import { toIsoDate } from "@/lib/date";
 
 interface Props {
   params: Promise<{ slug: string }>;
-}
-
-/** "2026.05.03" → "2026-05-03". 구조화 데이터는 ISO 형식을 요구한다. */
-function toIsoDate(date: string): string {
-  return date.trim().replace(/\./g, "-").replace(/-$/, "");
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -134,7 +130,9 @@ export default async function BlogPostPage({ params }: Props) {
             headline: post.title,
             description: post.description,
             datePublished: toIsoDate(post.date),
-            ...(post.reviewedAt ? { dateModified: post.reviewedAt } : {}),
+            ...(post.reviewedAt
+              ? { dateModified: toIsoDate(post.reviewedAt) }
+              : {}),
             author: { "@type": "Organization", name: SITE_AUTHOR },
             publisher: { "@type": "Organization", name: SITE_NAME },
             mainEntityOfPage: {

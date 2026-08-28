@@ -2,6 +2,7 @@
 import type { MetadataRoute } from "next";
 import { BASE_URL } from "@/lib/metadata";
 import { blogPosts } from "@/data/blogPosts";
+import { toIsoDate } from "@/lib/date";
 
 type StaticPage = {
   path: string;
@@ -113,7 +114,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .map((post) => ({
       url: `${BASE_URL}/blog/${post.slug}`,
       // 블로그는 실제 날짜를 안다. 검토했으면 검토일, 아니면 작성일.
-      lastModified: new Date(post.reviewedAt ?? post.date),
+      //
+      // post.date 는 `2026.05.02`, reviewedAt 은 `2026-08-29` 로 표기가 섞여 있다.
+      // 점 표기는 표준 형식이 아니라 Date 해석이 환경에 따라 달라지므로,
+      // Article 구조화 데이터와 같은 toIsoDate 로 맞춘 뒤 넣는다.
+      lastModified: new Date(toIsoDate(post.reviewedAt ?? post.date)),
       changeFrequency: "monthly",
       priority: 0.7,
     }));
