@@ -7,8 +7,21 @@ export const metadata: Metadata = buildMetadata({
   slug: "finance",
   title: "금융 계산기 — 예금·적금 이자와 복리 계산",
   description:
-    "예금 이자 계산기, 적금 이자 계산기, 복리 계산기, 예금 vs 적금·CMA vs 예금·단리 vs 복리 비교 계산기, 실질금리·인플레이션 계산기를 무료로 이용하세요. 세전·세후 이자와 만기 수령액, 물가를 반영한 실질금리와 구매력 변화까지 한 곳에서 확인합니다.",
-  keywords: ["금융계산기", "예금이자계산기", "적금이자계산기", "복리계산기", "저축계산기", "예금적금비교", "CMA예금비교", "실질금리계산기", "인플레이션계산기", "단리복리계산기"],
+    "예금 이자 계산기, 적금 이자 계산기, 복리 계산기, 예금 vs 적금·CMA vs 예금·단리 vs 복리 비교 계산기, 실질금리·인플레이션 계산기, 환전 계산기를 무료로 이용하세요. 세전·세후 이자와 만기 수령액, 물가를 반영한 실질금리와 구매력 변화까지 한 곳에서 확인합니다.",
+  keywords: [
+    "금융계산기",
+    "예금이자계산기",
+    "적금이자계산기",
+    "복리계산기",
+    "저축계산기",
+    "예금적금비교",
+    "CMA예금비교",
+    "실질금리계산기",
+    "인플레이션계산기",
+    "단리복리계산기",
+    "환전계산기",
+    "환율우대계산",
+  ],
 });
 
 const FINANCE_CALCS = [
@@ -73,6 +86,13 @@ const FINANCE_CALCS = [
     desc: "같은 원금·금리·기간에서 단리와 월복리의 최종 금액 차이를 연차별로 비교합니다.",
     href: "/finance/simple-vs-compound",
     icon: "📈",
+    badge: null,
+  },
+  {
+    title: "환전 계산기",
+    desc: "매매기준율과 수수료율을 입력해 우대율 적용 전후의 환율과 절약액을 계산합니다. 실시간 환율은 연동하지 않습니다.",
+    href: "/finance/exchange",
+    icon: "💱",
     badge: "신규",
   },
 ];
@@ -126,7 +146,9 @@ export default function Page() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
-        <h2 className="mb-6 text-xl font-black text-slate-800">전체 금융 계산기</h2>
+        <h2 className="mb-6 text-xl font-black text-slate-800">
+          전체 금융 계산기
+        </h2>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {FINANCE_CALCS.map((c) => (
             <Link
@@ -174,10 +196,11 @@ export default function Page() {
             예금·적금·복리, 무엇을 언제 쓸까
           </h2>
           <p className="mb-4">
-            같은 금리라도 돈을 넣는 방식에 따라 실제 이자는 달라집니다. 이미 목돈이
-            있다면 <strong className="text-slate-900">예금</strong>, 매달 일정
-            금액을 모으는 중이라면 <strong className="text-slate-900">적금</strong>,
-            이자를 다시 굴리는 장기 효과가 궁금하다면{" "}
+            같은 금리라도 돈을 넣는 방식에 따라 실제 이자는 달라집니다. 이미
+            목돈이 있다면 <strong className="text-slate-900">예금</strong>, 매달
+            일정 금액을 모으는 중이라면{" "}
+            <strong className="text-slate-900">적금</strong>, 이자를 다시 굴리는
+            장기 효과가 궁금하다면{" "}
             <strong className="text-slate-900">복리</strong> 계산기가 맞습니다.
             아래 표로 내 상황에 맞는 계산기를 먼저 골라 보세요.
           </p>
@@ -186,10 +209,18 @@ export default function Page() {
             <table className="w-full border-collapse text-sm">
               <thead>
                 <tr className="bg-slate-50">
-                  <th className="border border-slate-200 p-3 text-left">구분</th>
-                  <th className="border border-slate-200 p-3 text-left">예금</th>
-                  <th className="border border-slate-200 p-3 text-left">적금</th>
-                  <th className="border border-slate-200 p-3 text-left">복리</th>
+                  <th className="border border-slate-200 p-3 text-left">
+                    구분
+                  </th>
+                  <th className="border border-slate-200 p-3 text-left">
+                    예금
+                  </th>
+                  <th className="border border-slate-200 p-3 text-left">
+                    적금
+                  </th>
+                  <th className="border border-slate-200 p-3 text-left">
+                    복리
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -197,33 +228,57 @@ export default function Page() {
                   <td className="border border-slate-200 p-3 font-semibold text-slate-800">
                     넣는 방식
                   </td>
-                  <td className="border border-slate-200 p-3">목돈 일시 예치</td>
-                  <td className="border border-slate-200 p-3">매월 일정 금액 납입</td>
-                  <td className="border border-slate-200 p-3">원금·이자 반복 재투자</td>
+                  <td className="border border-slate-200 p-3">
+                    목돈 일시 예치
+                  </td>
+                  <td className="border border-slate-200 p-3">
+                    매월 일정 금액 납입
+                  </td>
+                  <td className="border border-slate-200 p-3">
+                    원금·이자 반복 재투자
+                  </td>
                 </tr>
                 <tr>
                   <td className="border border-slate-200 p-3 font-semibold text-slate-800">
                     적합한 상황
                   </td>
-                  <td className="border border-slate-200 p-3">이미 목돈이 있음</td>
-                  <td className="border border-slate-200 p-3">매월 저축 가능</td>
-                  <td className="border border-slate-200 p-3">장기간 자산 증식</td>
+                  <td className="border border-slate-200 p-3">
+                    이미 목돈이 있음
+                  </td>
+                  <td className="border border-slate-200 p-3">
+                    매월 저축 가능
+                  </td>
+                  <td className="border border-slate-200 p-3">
+                    장기간 자산 증식
+                  </td>
                 </tr>
                 <tr>
                   <td className="border border-slate-200 p-3 font-semibold text-slate-800">
                     핵심 입력값
                   </td>
-                  <td className="border border-slate-200 p-3">원금·금리·기간</td>
-                  <td className="border border-slate-200 p-3">월 납입액·금리·기간</td>
-                  <td className="border border-slate-200 p-3">원금·금리·기간·추가 납입</td>
+                  <td className="border border-slate-200 p-3">
+                    원금·금리·기간
+                  </td>
+                  <td className="border border-slate-200 p-3">
+                    월 납입액·금리·기간
+                  </td>
+                  <td className="border border-slate-200 p-3">
+                    원금·금리·기간·추가 납입
+                  </td>
                 </tr>
                 <tr>
                   <td className="border border-slate-200 p-3 font-semibold text-slate-800">
                     이자 특징
                   </td>
-                  <td className="border border-slate-200 p-3">전체 원금에 기간 적용</td>
-                  <td className="border border-slate-200 p-3">회차별 예치기간이 다름</td>
-                  <td className="border border-slate-200 p-3">이자에 다시 이자</td>
+                  <td className="border border-slate-200 p-3">
+                    전체 원금에 기간 적용
+                  </td>
+                  <td className="border border-slate-200 p-3">
+                    회차별 예치기간이 다름
+                  </td>
+                  <td className="border border-slate-200 p-3">
+                    이자에 다시 이자
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -233,12 +288,12 @@ export default function Page() {
             예금과 적금의 차이
           </h2>
           <p className="mb-6">
-            예금은 목돈을 한 번에 넣어 전체 금액이 만기까지 이자를 받습니다. 반면
-            적금은 매달 나눠 넣기 때문에, 표시 금리가 같아도 이자액은 같지 않습니다.
-            첫 달 납입금만 전체 기간의 이자를 받고 마지막 달 납입금은 한 달치 이자만
-            받으므로, 적금 이자는 ‘총 납입액 × 금리’로 단순 계산한 값의 절반가량이
-            됩니다. 예를 들어 월 50만 원씩 1년, 연 4%라면 이자는 24만 원이 아니라 약
-            13만 원입니다.
+            예금은 목돈을 한 번에 넣어 전체 금액이 만기까지 이자를 받습니다.
+            반면 적금은 매달 나눠 넣기 때문에, 표시 금리가 같아도 이자액은 같지
+            않습니다. 첫 달 납입금만 전체 기간의 이자를 받고 마지막 달 납입금은
+            한 달치 이자만 받으므로, 적금 이자는 ‘총 납입액 × 금리’로 단순
+            계산한 값의 절반가량이 됩니다. 예를 들어 월 50만 원씩 1년, 연 4%라면
+            이자는 24만 원이 아니라 약 13만 원입니다.
           </p>
 
           <h2 className="mb-4 text-xl font-black text-slate-900">
@@ -246,20 +301,23 @@ export default function Page() {
           </h2>
           <p className="mb-6">
             은행에서 보는 연 3.5% 같은 금리는 보통 세전입니다. 일반과세 상품은
-            이자에서 이자소득세 15.4%(소득세 14% + 지방소득세 1.4%)가 원천징수되므로,
-            실제 손에 쥐는 금액은 세전보다 줄어듭니다. 그래서 각 계산기는 세전 이자,
-            세금, 세후 이자, 만기 수령액을 분리해 보여 줍니다. 비과세는 비과세종합저축
-            등 법령이 정한 자격·상품 조건을 충족해야 적용되며, 누구나 임의로 선택하는
-            옵션이 아닙니다.
+            이자에서 이자소득세 15.4%(소득세 14% + 지방소득세 1.4%)가
+            원천징수되므로, 실제 손에 쥐는 금액은 세전보다 줄어듭니다. 그래서 각
+            계산기는 세전 이자, 세금, 세후 이자, 만기 수령액을 분리해 보여
+            줍니다. 비과세는 비과세종합저축 등 법령이 정한 자격·상품 조건을
+            충족해야 적용되며, 누구나 임의로 선택하는 옵션이 아닙니다.
           </p>
 
-          <h2 className="mb-4 text-xl font-black text-slate-900">단리와 복리</h2>
+          <h2 className="mb-4 text-xl font-black text-slate-900">
+            단리와 복리
+          </h2>
           <p className="mb-6">
-            단리는 원금에만 이자가 붙고, 복리는 발생한 이자가 원금에 더해져 다음 이자
-            계산에 포함됩니다. 기간이 짧거나 금리가 낮으면 둘의 차이는 작지만, 기간이
-            길수록 복리 효과가 커집니다. 예금 계산기에서는 기본적으로 단리를 사용하되
-            상품 조건에 따라 월복리를 비교할 수 있고, 복리 계산기에서는 장기 재투자
-            효과를 세전 기준으로 가늠할 수 있습니다.
+            단리는 원금에만 이자가 붙고, 복리는 발생한 이자가 원금에 더해져 다음
+            이자 계산에 포함됩니다. 기간이 짧거나 금리가 낮으면 둘의 차이는
+            작지만, 기간이 길수록 복리 효과가 커집니다. 예금 계산기에서는
+            기본적으로 단리를 사용하되 상품 조건에 따라 월복리를 비교할 수 있고,
+            복리 계산기에서는 장기 재투자 효과를 세전 기준으로 가늠할 수
+            있습니다.
           </p>
 
           <h2 className="mb-4 text-xl font-black text-slate-900">
@@ -272,25 +330,28 @@ export default function Page() {
               우대금리 포함인지 확인하세요.
             </li>
             <li>
-              <strong className="text-slate-800">세전 vs 세후</strong> — 광고 금리는
-              세전인 경우가 많습니다. 세후 실수령 기준으로 비교하세요.
+              <strong className="text-slate-800">세전 vs 세후</strong> — 광고
+              금리는 세전인 경우가 많습니다. 세후 실수령 기준으로 비교하세요.
             </li>
             <li>
-              <strong className="text-slate-800">중도해지 이율</strong> — 만기 전
-              해지하면 약정 금리가 아닌 낮은 중도해지 이율이 적용됩니다.
+              <strong className="text-slate-800">중도해지 이율</strong> — 만기
+              전 해지하면 약정 금리가 아닌 낮은 중도해지 이율이 적용됩니다.
             </li>
             <li>
-              <strong className="text-slate-800">납입 한도·자동이체일</strong> — 월
-              납입 한도가 있는지, 자동이체 날짜에 따라 적금 이자가 달라질 수 있는지
+              <strong className="text-slate-800">납입 한도·자동이체일</strong> —
+              월 납입 한도가 있는지, 자동이체 날짜에 따라 적금 이자가 달라질 수
+              있는지 확인하세요.
+            </li>
+            <li>
+              <strong className="text-slate-800">예금자보호</strong> — 원금과
+              소정의 이자를 합해 금융회사별 1인당 1억 원까지 보호되는 상품인지
               확인하세요.
-            </li>
-            <li>
-              <strong className="text-slate-800">예금자보호</strong> — 원금과 소정의
-              이자를 합해 금융회사별 1인당 1억 원까지 보호되는 상품인지 확인하세요.
             </li>
           </ul>
 
-          <h2 className="mb-4 text-xl font-black text-slate-900">자주 묻는 질문</h2>
+          <h2 className="mb-4 text-xl font-black text-slate-900">
+            자주 묻는 질문
+          </h2>
           <div className="mb-8 space-y-4">
             {FAQ.map((f) => (
               <div
@@ -304,13 +365,16 @@ export default function Page() {
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-            <p className="mb-2 text-sm font-bold text-slate-800">📌 참고 안내</p>
+            <p className="mb-2 text-sm font-bold text-slate-800">
+              📌 참고 안내
+            </p>
             <p className="text-xs leading-relaxed text-slate-500">
               본 페이지의 계산 결과와 설명은 일반적인 정보 제공을 목적으로 한
-              참고용이며, 개인 맞춤 금융 자문이 아닙니다. 금리·세율·예금자보호 한도는
-              정책에 따라 바뀔 수 있으므로, 실제 상품 조건과 최신 기준은 은행연합회
-              소비자포털, 저축은행중앙회, 한국은행, 국세청, 예금보험공사 등 공식 자료와
-              금융기관 안내로 확인하시기 바랍니다. 자세한 사항은{" "}
+              참고용이며, 개인 맞춤 금융 자문이 아닙니다. 금리·세율·예금자보호
+              한도는 정책에 따라 바뀔 수 있으므로, 실제 상품 조건과 최신 기준은
+              은행연합회 소비자포털, 저축은행중앙회, 한국은행, 국세청,
+              예금보험공사 등 공식 자료와 금융기관 안내로 확인하시기 바랍니다.
+              자세한 사항은{" "}
               <Link
                 href="/disclaimer"
                 className="text-brand-600 underline underline-offset-2 hover:text-brand-700"

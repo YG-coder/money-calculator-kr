@@ -79,6 +79,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "finance/real-interest-rate", priority: 0.9, freq: "monthly" },
     { path: "finance/inflation", priority: 0.9, freq: "monthly" },
     { path: "finance/simple-vs-compound", priority: 0.9, freq: "monthly" },
+    { path: "finance/exchange", priority: 0.9, freq: "monthly" },
 
     // 기타
     { path: "blog", priority: 0.8, freq: "daily" },
@@ -99,11 +100,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const blogEntries: MetadataRoute.Sitemap = blogPosts
     .filter((post) => post.published !== false)
     .map((post) => ({
-    url: `${BASE_URL}/blog/${post.slug}`,
-    lastModified: new Date(post.date),
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
+      url: `${BASE_URL}/blog/${post.slug}`,
+      lastModified: new Date(post.date),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    }));
 
   return [...staticEntries, ...blogEntries];
 }

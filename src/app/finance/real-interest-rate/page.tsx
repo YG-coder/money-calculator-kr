@@ -81,15 +81,13 @@ export default function Page() {
         calculator={<RealInterestCalc />}
         guide={
           <>
-            <h2 className="text-xl font-bold text-slate-900">
-              실질금리란?
-            </h2>
+            <h2 className="text-xl font-bold text-slate-900">실질금리란?</h2>
             <p>
               <strong>명목금리</strong>는 통장에 표시되는 금리이고,
               <strong>실질금리</strong>는 거기서 물가상승률을 반영해 &lsquo;돈의
               구매력이 실제로 얼마나 늘었는가&rsquo;를 나타낸 금리입니다. 이자를
-              5% 받아도 물가가 5% 오르면, 살 수 있는 물건의 양은 그대로이므로 실질
-              금리는 0에 가깝습니다.
+              5% 받아도 물가가 5% 오르면, 살 수 있는 물건의 양은 그대로이므로
+              실질 금리는 0에 가깝습니다.
             </p>
 
             <h2 className="text-xl font-bold text-slate-900">
@@ -107,26 +105,27 @@ export default function Page() {
             </ul>
 
             <p>
-              예를 들어 명목 5%·물가 3%면 근사식은 2.00%, 정확식은 약 1.94%입니다.
-              이 계산기는 정확식을 메인으로 보여주고 근사식을 함께 표시합니다.
+              예를 들어 명목 5%·물가 3%면 근사식은 2.00%, 정확식은 약
+              1.94%입니다. 이 계산기는 정확식을 메인으로 보여주고 근사식을 함께
+              표시합니다.
             </p>
 
             <h2 className="text-xl font-bold text-slate-900">
               구매력 관점으로 읽기
             </h2>
             <p>
-              실질금리가 양수면 이자가 물가를 앞질러 구매력이 늘어난 것이고, 음수면
-              이자를 받아도 물가를 따라가지 못해 구매력이 줄어든 것입니다. 예치금액을
-              입력하면 세전 명목 이자와, 물가를 반영한 실질 가치 증감을 1년
-              기준 금액으로 비교해 볼 수 있습니다.
+              실질금리가 양수면 이자가 물가를 앞질러 구매력이 늘어난 것이고,
+              음수면 이자를 받아도 물가를 따라가지 못해 구매력이 줄어든
+              것입니다. 예치금액을 입력하면 세전 명목 이자와, 물가를 반영한 실질
+              가치 증감을 1년 기준 금액으로 비교해 볼 수 있습니다.
             </p>
 
             <div className="rounded-2xl bg-blue-50 p-5 text-blue-900">
               <p className="font-bold">함께 확인하면 좋은 것</p>
               <p className="mt-2">
                 시간이 지날수록 물가가 돈의 가치를 얼마나 깎는지는 인플레이션
-                계산기에서, 예금 자체의 이자·만기 수령액은 예금 이자 계산기에서 확인할
-                수 있습니다.
+                계산기에서, 예금 자체의 이자·만기 수령액은 예금 이자 계산기에서
+                확인할 수 있습니다.
               </p>
             </div>
           </>
@@ -135,9 +134,17 @@ export default function Page() {
         faq={FAQ}
         relatedCalcs={[
           { label: "예금 이자 계산기", href: "/finance/deposit", icon: "🏦" },
-          { label: "예금 vs 적금 계산기", href: "/finance/deposit-vs-savings", icon: "⚖️" },
-          { label: "CMA vs 예금 계산기", href: "/finance/cma-vs-deposit", icon: "⚖️" },
-          { label: "복리 계산기", href: "/finance/compound", icon: "📈" },
+          {
+            label: "예금 vs 적금 계산기",
+            href: "/finance/deposit-vs-savings",
+            icon: "⚖️",
+          },
+          {
+            label: "CMA vs 예금 계산기",
+            href: "/finance/cma-vs-deposit",
+            icon: "⚖️",
+          },
+          { label: "환전 계산기", href: "/finance/exchange", icon: "💱" },
         ]}
         relatedGuides={[]}
       />

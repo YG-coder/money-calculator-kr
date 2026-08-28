@@ -10,7 +10,12 @@ export const metadata: Metadata = buildMetadata({
   title: "인플레이션 계산기 — 내 돈의 미래 구매력",
   description:
     "물가상승률이 이어질 때 현재 금액의 미래 구매력과 감소율, 같은 구매력을 유지하는 데 필요한 미래 금액을 계산합니다. 현금·저축의 가치 변화 관점.",
-  keywords: ["인플레이션계산기", "구매력계산", "화폐가치하락", "물가상승계산기"],
+  keywords: [
+    "인플레이션계산기",
+    "구매력계산",
+    "화폐가치하락",
+    "물가상승계산기",
+  ],
 });
 
 const crumbs = [
@@ -83,10 +88,11 @@ export default function Page() {
               인플레이션과 구매력
             </h2>
             <p>
-              인플레이션(물가 상승)은 시간이 지나면서 같은 돈으로 살 수 있는 물건의
-              양이 줄어드는 현상입니다. 금액 자체는 그대로여도, 물가가 오르면 그 돈의
-              <strong>구매력</strong>은 떨어집니다. 이 계산기는 물가상승률이 이어질
-              때 현재 금액의 미래 구매력이 얼마나 되는지를 보여줍니다.
+              인플레이션(물가 상승)은 시간이 지나면서 같은 돈으로 살 수 있는
+              물건의 양이 줄어드는 현상입니다. 금액 자체는 그대로여도, 물가가
+              오르면 그 돈의
+              <strong>구매력</strong>은 떨어집니다. 이 계산기는 물가상승률이
+              이어질 때 현재 금액의 미래 구매력이 얼마나 되는지를 보여줍니다.
             </p>
 
             <h2 className="text-xl font-bold text-slate-900">계산 방식</h2>
@@ -96,17 +102,17 @@ export default function Page() {
               <li>구매력 감소율 = 1 − 1 ÷ (1 + 물가상승률)^기간</li>
             </ul>
             <p>
-              앞의 값은 미래의 돈을 현재 가치로 환산한 것이고, 뒤의 값은 미래에 같은
-              구매력을 가지려면 필요한 명목 금액입니다.
+              앞의 값은 미래의 돈을 현재 가치로 환산한 것이고, 뒤의 값은 미래에
+              같은 구매력을 가지려면 필요한 명목 금액입니다.
             </p>
 
             <h2 className="text-xl font-bold text-slate-900">
               작은 물가상승률도 오래 쌓이면 큽니다
             </h2>
             <p>
-              연 2~3%는 작아 보이지만 복리처럼 누적됩니다. 예를 들어 매년 3%면 10년
-              뒤 구매력은 약 26% 줄고, 2.5%라도 20년이면 약 39% 줄어듭니다. 그래서
-              현금을 오래 그대로 두면 명목 금액은 같아도 실제 가치는 계속
+              연 2~3%는 작아 보이지만 복리처럼 누적됩니다. 예를 들어 매년 3%면
+              10년 뒤 구매력은 약 26% 줄고, 2.5%라도 20년이면 약 39% 줄어듭니다.
+              그래서 현금을 오래 그대로 두면 명목 금액은 같아도 실제 가치는 계속
               내려갑니다.
             </p>
 
@@ -114,8 +120,8 @@ export default function Page() {
               <p className="font-bold">함께 확인하면 좋은 것</p>
               <p className="mt-2">
                 이자를 함께 고려해 물가 대비 실제 수익이 얼마인지는 실질금리
-                계산기에서, 저축이 복리로 얼마나 불어나는지는 복리 계산기에서 확인할
-                수 있습니다.
+                계산기에서, 저축이 복리로 얼마나 불어나는지는 복리 계산기에서
+                확인할 수 있습니다.
               </p>
             </div>
           </>
@@ -123,10 +129,14 @@ export default function Page() {
         examples={EXAMPLES}
         faq={FAQ}
         relatedCalcs={[
-          { label: "실질금리 계산기", href: "/finance/real-interest-rate", icon: "📉" },
+          {
+            label: "실질금리 계산기",
+            href: "/finance/real-interest-rate",
+            icon: "📉",
+          },
           { label: "복리 계산기", href: "/finance/compound", icon: "📈" },
           { label: "예금 이자 계산기", href: "/finance/deposit", icon: "🏦" },
-          { label: "목표저축 계산기", href: "/finance/goal-savings", icon: "🎯" },
+          { label: "환전 계산기", href: "/finance/exchange", icon: "💱" },
         ]}
         relatedGuides={[]}
       />
