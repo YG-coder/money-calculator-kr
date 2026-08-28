@@ -14,7 +14,7 @@ import {
 export const metadata: Metadata = buildMetadata({
   title: "머니계산기 | DSR·LTV·실투자금·대출·부동산·예적금 계산기",
   description:
-    "DSR·LTV로 대출 한도를, 실투자금·취득세로 주택 구입에 필요한 현금을, 임대수익률로 투자 결과를 계산합니다. 대출이자·전세와 월세·예금·적금·환전까지 27개 계산기를 무료로 이용하세요.",
+    "DSR·LTV로 대출 한도를, 실투자금·취득세로 주택 구입에 필요한 현금을, 임대수익률로 투자 결과를 계산합니다. 대출이자·전세와 월세·예금·적금·환전까지 다양한 계산기를 무료로 이용하세요.",
 });
 
 const latestPosts = blogPosts
@@ -24,7 +24,7 @@ const latestPosts = blogPosts
 const HOME_FAQ = [
   {
     q: "무엇부터 계산해야 하나요?",
-    a: "목적에 따라 다릅니다. 대출을 앞두고 있다면 DSR로 소득 기준 한도를, 주택 담보라면 LTV로 담보 기준 한도를 먼저 봅니다. 실제 한도는 두 값 중 낮은 쪽으로 정해집니다. 매수를 검토 중이라면 실투자금 계산기로 매매가 외에 필요한 현금을 확인하는 편이 빠릅니다.",
+    a: "목적에 따라 다릅니다. 대출을 앞두고 있다면 DSR로 소득 기준 한도를, 주택 담보라면 LTV로 담보 기준 한도를 먼저 봅니다. DSR과 LTV 기준을 모두 충족해야 하며, 금융회사의 심사 결과에 따라 실제 한도는 더 낮을 수 있습니다. 매수를 검토 중이라면 실투자금 계산기로 매매가 외에 필요한 현금을 확인하는 편이 빠릅니다.",
   },
   {
     q: "계산 결과가 실제 은행과 다를 수 있나요?",
@@ -40,21 +40,28 @@ const HOME_FAQ = [
   },
 ];
 
-function CalcCard({ calc }: { calc: CalcKey }) {
+/** 그룹당 하나뿐인 대표 시작 CTA */
+function PrimaryCta({ calc }: { calc: CalcKey }) {
   const c = CALC[calc];
   return (
     <Link
       href={c.href}
-      className="group flex flex-col rounded-xl border border-slate-200 bg-white p-5 transition-colors hover:border-brand-300 hover:bg-brand-50/40"
+      className="group flex items-center justify-between gap-4 rounded-xl border-2 border-brand-600 bg-brand-600 p-5 text-white transition-colors hover:bg-brand-700"
     >
-      <span className="font-bold text-slate-900 transition-colors group-hover:text-brand-700">
-        {c.title}
+      <span>
+        <span className="block text-xs font-bold text-brand-200">
+          여기서 시작
+        </span>
+        <span className="mt-0.5 block text-lg font-black">{c.title}</span>
+        <span className="mt-1 block text-sm leading-relaxed text-brand-100">
+          {c.desc}
+        </span>
       </span>
-      <span className="mt-1.5 text-sm leading-relaxed text-slate-600">
-        {c.desc}
-      </span>
-      <span className="mt-3 text-sm font-semibold text-brand-600">
-        계산하기 →
+      <span
+        aria-hidden="true"
+        className="shrink-0 text-xl transition-transform group-hover:translate-x-0.5"
+      >
+        →
       </span>
     </Link>
   );
@@ -128,10 +135,13 @@ export default function Page() {
                   {g.when}
                 </p>
 
-                <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {g.cards.map((k) => (
-                    <CalcCard key={k} calc={k} />
-                  ))}
+                <div className="mt-5">
+                  <PrimaryCta calc={g.primary} />
+                  {g.primaryNote && (
+                    <p className="mt-2.5 text-sm leading-relaxed text-slate-600">
+                      {g.primaryNote}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-5 border-t border-slate-100 pt-4">
@@ -139,7 +149,7 @@ export default function Page() {
                     같은 상황에서 함께 쓰는 계산기
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {g.more.map((k) => (
+                    {g.secondary.map((k) => (
                       <CalcChip key={k} calc={k} />
                     ))}
                   </div>
@@ -266,14 +276,9 @@ export default function Page() {
                 href={h.href}
                 className="group rounded-2xl border border-slate-200 bg-white p-5 transition-colors hover:border-brand-300 hover:bg-brand-50/40"
               >
-                <div className="flex items-baseline justify-between">
-                  <span className="font-black text-slate-900 transition-colors group-hover:text-brand-700">
-                    {h.title}
-                  </span>
-                  <span className="text-xs font-semibold text-slate-400">
-                    {h.count}개
-                  </span>
-                </div>
+                <span className="block font-black text-slate-900 transition-colors group-hover:text-brand-700">
+                  {h.title}
+                </span>
                 <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
                   {h.desc}
                 </p>

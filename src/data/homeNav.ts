@@ -129,25 +129,46 @@ export interface PurposeGroup {
   title: string;
   /** "이런 상황에서 시작하세요" 한 줄 */
   when: string;
-  cards: CalcKey[];
-  more: CalcKey[];
+  /**
+   * 대표 시작 CTA. 그룹마다 **하나만** 둔다.
+   *
+   * ⚠️ 같은 크기 카드를 여러 개 두면 "무엇부터 눌러야 하나"를 사용자가 다시
+   *    고민하게 된다. 홈의 목적은 그 고민을 없애는 것이다.
+   */
+  primary: CalcKey;
+  /** 대표 CTA 아래 한 줄 보충. 함께 봐야 하는 것이 있을 때만 */
+  primaryNote?: string;
+  /** 보조 계산기. 작은 링크로만 노출한다 */
+  secondary: CalcKey[];
 }
 
 export const PURPOSE_GROUPS: PurposeGroup[] = [
   {
     id: "limit",
     title: "얼마나 빌릴 수 있는지 알아보기",
-    when: "대출을 앞두고 한도부터 가늠해야 할 때. 실제 한도는 소득 기준과 담보 기준 중 낮은 쪽으로 정해집니다.",
-    cards: ["dsr", "ltv", "loanInterest"],
-    more: ["amortization", "jeonseLoan", "prepayment", "refinance"],
+    when: "대출을 앞두고 한도부터 가늠해야 할 때. 소득으로 감당되는 금액을 먼저 봅니다.",
+    primary: "dsr",
+    primaryNote:
+      "주택담보대출이라면 LTV도 함께 확인하세요. DSR과 LTV 기준을 모두 충족해야 하며, 금융회사의 심사 결과에 따라 실제 한도는 더 낮을 수 있습니다.",
+    secondary: [
+      "ltv",
+      "loanInterest",
+      "amortization",
+      "jeonseLoan",
+      "prepayment",
+      "refinance",
+    ],
   },
   {
     id: "house",
     title: "집을 사거나 임대 투자 준비하기",
     when: "매수를 검토 중이거나 임대 수익을 따져 볼 때. 매매가 외에 세금·중개보수·등기비용이 함께 나갑니다.",
-    cards: ["initialCost", "jeonseVsWolse"],
-    more: [
+    primary: "initialCost",
+    primaryNote:
+      "매매가만 준비하면 부족합니다. 취득세·중개보수·등기비용을 더한 금액이 실제로 필요합니다.",
+    secondary: [
       "acquisitionTax",
+      "jeonseVsWolse",
       "propertyYield",
       "jeonseWolseConversion",
       "vacancy",
@@ -157,8 +178,12 @@ export const PURPOSE_GROUPS: PurposeGroup[] = [
     id: "cash",
     title: "저축하고 현금 관리하기",
     when: "목돈을 모으거나 굴릴 때, 그리고 외화를 바꿔야 할 때.",
-    cards: ["exchange"],
-    more: ["deposit", "installmentSavings", "compound", "goalSavings"],
+    // 저축의 출발점은 "얼마를 모아야 하나"이므로 목표 저축을 대표로 둔다.
+    // 예·적금 이자 계산은 목표가 정해진 뒤의 단계다.
+    primary: "goalSavings",
+    primaryNote:
+      "목표 금액과 기간을 정하면 매달 얼마를 넣어야 하는지 역산합니다.",
+    secondary: ["deposit", "installmentSavings", "compound", "exchange"],
   },
 ];
 
@@ -195,7 +220,7 @@ export const MONEY_FLOW: FlowStep[] = [
     calc: "ltv",
     headline: "담보 기준 한도",
     detail:
-      "주택가격과 지역·주택 수로 담보가 감당하는 한도를 봅니다. 실제 한도는 1·2 중 낮은 쪽입니다.",
+      "주택가격과 지역·주택 수로 담보가 감당하는 한도를 봅니다. DSR과 LTV 기준을 모두 충족해야 하며, 금융회사의 심사 결과에 따라 실제 한도는 더 낮을 수 있습니다.",
     handoff: "주택가격과 한도가 다음 단계로 이어집니다.",
   },
   {
@@ -222,23 +247,23 @@ export const MONEY_FLOW: FlowStep[] = [
 //    스크롤만 길어지므로, 홈은 카테고리 진입점까지만 제공한다.
 // ─────────────────────────────────────────────
 
+// ⚠️ 계산기 개수를 적지 않는다. 중앙 레지스트리가 없어 하드코딩한 숫자는
+//    계산기를 추가할 때마다 낡는다. 전체 목록을 한곳에서 산출할 수 있게 되면
+//    그때 자동 계산해서 표기한다.
 export const CATEGORY_HUBS = [
   {
     title: "대출 계산기",
     href: "/loan",
     desc: "이자·상환 방식·한도·갈아타기까지",
-    count: 10,
   },
   {
     title: "부동산 계산기",
     href: "/real-estate",
     desc: "세금·실투자금·수익률·전세와 월세",
-    count: 7,
   },
   {
     title: "금융 계산기",
     href: "/finance",
     desc: "예금·적금·복리·물가·환전",
-    count: 10,
   },
 ];
