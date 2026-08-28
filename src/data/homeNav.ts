@@ -138,52 +138,48 @@ export interface PurposeGroup {
   primary: CalcKey;
   /** 대표 CTA 아래 한 줄 보충. 함께 봐야 하는 것이 있을 때만 */
   primaryNote?: string;
-  /** 보조 계산기. 작은 링크로만 노출한다 */
+  /**
+   * 보조 계산기. 칩 링크로 노출한다.
+   *
+   * ⚠️ 3개까지만 둔다. 카드가 3열로 좁아져 그 이상은 줄바꿈이 지저분해진다.
+   *    나머지는 hub 로 보낸다.
+   */
   secondary: CalcKey[];
+  /** 이 목적의 나머지 계산기를 담은 카테고리 허브 */
+  hub: { label: string; href: string };
 }
 
 export const PURPOSE_GROUPS: PurposeGroup[] = [
   {
     id: "limit",
-    title: "얼마나 빌릴 수 있는지 알아보기",
+    title: "얼마나 빌릴 수 있나",
     when: "대출을 앞두고 한도부터 가늠해야 할 때. 소득으로 감당되는 금액을 먼저 봅니다.",
     primary: "dsr",
-    primaryNote:
-      "주택담보대출이라면 LTV도 함께 확인하세요. DSR과 LTV 기준을 모두 충족해야 하며, 금융회사의 심사 결과에 따라 실제 한도는 더 낮을 수 있습니다.",
-    secondary: [
-      "ltv",
-      "loanInterest",
-      "amortization",
-      "jeonseLoan",
-      "prepayment",
-      "refinance",
-    ],
+    // 전체 문구(모두 충족 · 심사에 따라 더 낮을 수 있음)는 자금 흐름 2단계와
+    // FAQ 에 있다. 카드 안에서는 다음 행동만 짧게 가리킨다.
+    primaryNote: "주택담보대출이라면 LTV도 함께 확인하세요.",
+    secondary: ["ltv", "loanInterest", "amortization"],
+    hub: { label: "대출 계산기 전체", href: "/loan" },
   },
   {
     id: "house",
-    title: "집을 사거나 임대 투자 준비하기",
-    when: "매수를 검토 중이거나 임대 수익을 따져 볼 때. 매매가 외에 세금·중개보수·등기비용이 함께 나갑니다.",
+    title: "집을 사거나 임대 투자",
+    when: "매수를 검토하거나 임대 수익을 따져 볼 때. 세금·중개보수·등기비용이 함께 나갑니다.",
     primary: "initialCost",
-    primaryNote:
-      "매매가만 준비하면 부족합니다. 취득세·중개보수·등기비용을 더한 금액이 실제로 필요합니다.",
-    secondary: [
-      "acquisitionTax",
-      "jeonseVsWolse",
-      "propertyYield",
-      "jeonseWolseConversion",
-      "vacancy",
-    ],
+    primaryNote: "매매가만 준비하면 부족합니다.",
+    secondary: ["acquisitionTax", "propertyYield", "jeonseVsWolse"],
+    hub: { label: "부동산 계산기 전체", href: "/real-estate" },
   },
   {
     id: "cash",
-    title: "저축하고 현금 관리하기",
+    title: "저축하고 현금 관리",
     when: "목돈을 모으거나 굴릴 때, 그리고 외화를 바꿔야 할 때.",
     // 저축의 출발점은 "얼마를 모아야 하나"이므로 목표 저축을 대표로 둔다.
     // 예·적금 이자 계산은 목표가 정해진 뒤의 단계다.
     primary: "goalSavings",
-    primaryNote:
-      "목표 금액과 기간을 정하면 매달 얼마를 넣어야 하는지 역산합니다.",
-    secondary: ["deposit", "installmentSavings", "compound", "exchange"],
+    primaryNote: "목표와 기간을 정하면 월 납입액을 역산합니다.",
+    secondary: ["deposit", "installmentSavings", "exchange"],
+    hub: { label: "금융 계산기 전체", href: "/finance" },
   },
 ];
 

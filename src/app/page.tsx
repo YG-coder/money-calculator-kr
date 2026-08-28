@@ -40,26 +40,23 @@ const HOME_FAQ = [
   },
 ];
 
-/** 그룹당 하나뿐인 대표 시작 CTA */
+/**
+ * 그룹당 하나뿐인 대표 시작 CTA.
+ *
+ * ⚠️ inline-flex 로 둔다. 블록으로 두면 카드 폭 전체를 채워 버튼이 아니라
+ *    광고 배너처럼 보인다. 설명은 버튼 안이 아니라 위쪽 본문에 둔다.
+ */
 function PrimaryCta({ calc }: { calc: CalcKey }) {
   const c = CALC[calc];
   return (
     <Link
       href={c.href}
-      className="group flex items-center justify-between gap-4 rounded-xl border-2 border-brand-600 bg-brand-600 p-5 text-white transition-colors hover:bg-brand-700"
+      className="group inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-700"
     >
-      <span>
-        <span className="block text-xs font-bold text-brand-200">
-          여기서 시작
-        </span>
-        <span className="mt-0.5 block text-lg font-black">{c.title}</span>
-        <span className="mt-1 block text-sm leading-relaxed text-brand-100">
-          {c.desc}
-        </span>
-      </span>
+      {c.title}로 시작
       <span
         aria-hidden="true"
-        className="shrink-0 text-xl transition-transform group-hover:translate-x-0.5"
+        className="transition-transform group-hover:translate-x-0.5"
       >
         →
       </span>
@@ -72,7 +69,7 @@ function CalcChip({ calc }: { calc: CalcKey }) {
   return (
     <Link
       href={c.href}
-      className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 transition-colors hover:border-brand-300 hover:text-brand-700"
+      className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-600 transition-colors hover:border-brand-300 hover:text-brand-700"
     >
       {c.title}
     </Link>
@@ -115,7 +112,7 @@ export default function Page() {
 
       {/* ── 목적별 시작 ── */}
       <section id="start" className="scroll-mt-16 bg-slate-50 py-14">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <h2 className="text-2xl font-black text-slate-900">
             어떤 상황이신가요?
           </h2>
@@ -124,36 +121,43 @@ export default function Page() {
             나머지는 자연스럽게 이어집니다.
           </p>
 
-          <div className="mt-8 space-y-6">
+          <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
             {PURPOSE_GROUPS.map((g) => (
               <div
                 key={g.id}
-                className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7"
+                className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5"
               >
-                <h3 className="text-lg font-black text-slate-900">{g.title}</h3>
-                <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-600">
+                <h3 className="text-base font-black text-slate-900">
+                  {g.title}
+                </h3>
+                {/* grow: 설명 길이가 달라도 카드마다 CTA 위치를 맞춘다 */}
+                <p className="mt-1.5 grow text-sm leading-relaxed text-slate-600">
                   {g.when}
                 </p>
 
-                <div className="mt-5">
+                <div className="mt-4">
                   <PrimaryCta calc={g.primary} />
-                  {g.primaryNote && (
-                    <p className="mt-2.5 text-sm leading-relaxed text-slate-600">
-                      {g.primaryNote}
-                    </p>
-                  )}
                 </div>
-
-                <div className="mt-5 border-t border-slate-100 pt-4">
-                  <p className="mb-2.5 text-xs font-semibold text-slate-500">
-                    같은 상황에서 함께 쓰는 계산기
+                {g.primaryNote && (
+                  <p className="mt-2 text-xs leading-relaxed text-slate-500">
+                    {g.primaryNote}
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                )}
+
+                <div className="mt-4 border-t border-slate-100 pt-3">
+                  <div className="flex flex-wrap gap-1.5">
                     {g.secondary.map((k) => (
                       <CalcChip key={k} calc={k} />
                     ))}
                   </div>
                 </div>
+
+                <Link
+                  href={g.hub.href}
+                  className="mt-3 text-xs font-semibold text-brand-600 hover:text-brand-700"
+                >
+                  {g.hub.label} →
+                </Link>
               </div>
             ))}
           </div>
