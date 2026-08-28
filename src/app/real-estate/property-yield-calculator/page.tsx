@@ -2,6 +2,7 @@
 
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import Link from "next/link";
 import { buildMetadata, BASE_URL } from "@/lib/metadata";
 import CalcShell, { type CalcExample } from "@/components/calculator/CalcShell";
 import PropertyYieldCalc from "@/components/calculator/PropertyYieldCalc";
@@ -68,8 +69,9 @@ const GUIDE = (
                 <strong>자기자본 수익률</strong>을 함께 계산해 주는 도구입니다. 같은
                 매물이라도 대출을 얼마나 쓰느냐에 따라 대출이자를 반영한 자기자본
                 수익률이 크게 달라지므로, 두 수익률을 나눠 보는 것이 임대용 부동산
-                판단의 출발점입니다. 이 계산기는 취득세·중개보수 같은 취득비용은
-                반영하지 않습니다.
+                판단의 출발점입니다. 취득세·중개보수·등기비용 같은 취득 부대비용은{" "}
+                <strong>취득 부대비용</strong> 항목에 넣으면 자기자본 수익률
+                분모에 반영됩니다(선택, 기본 0).
             </p>
         </div>
 
@@ -119,8 +121,11 @@ const GUIDE = (
             </h2>
             <p className="mt-3 text-slate-600 leading-7">
                 이 계산기가 반영하는 것은 대출이자와 월 관리·기타비용입니다. 반대로
-                공실, 취득세·재산세·종합부동산세·양도소득세, 중개수수료, 수선비는
-                반영하지 않으므로 실제 순수익률은 이보다 낮은 것이 일반적입니다. 예를
+                공실, 재산세·종합부동산세·양도소득세, 수선비는 반영하지 않으므로 실제
+                순수익률은 이보다 낮은 것이 일반적입니다. 취득세·중개보수 같은
+                매입 시점의 일회성 비용은 &lsquo;취득 부대비용&rsquo;에 넣으면
+                자기자본 수익률 분모에 반영되지만, 보유 중 매년 나가는 세금은
+                여전히 빠져 있습니다. 예를
                 들어 연 1개월가량(약 8%) 공실만 잡아도 연 임대수익이 눈에 띄게 줄어
                 자기자본 수익률이 함께 내려갑니다. 또한 이 계산기는 임대수익률만
                 다루며, 매각 시 시세차익이나 양도소득세는 별도로 따져야 합니다. 대출
@@ -134,8 +139,16 @@ const GUIDE = (
             <p className="mt-3 text-slate-600 leading-7">
                 매입가 기준 수익률은 취득비용을 제외한 매입가 기준이라 매물을 빠르게
                 비교할 때 적합하고, 실제 투자 판단은 자기자본 수익률과 함께 봐야
-                합니다. 이 계산기는 취득세·중개보수를 반영하지 않으므로(실투자금 계산기에서 확인하세요) 실제 초기
-                투자금은 계산된 실투자금보다 큽니다. 입력한 월세·보증금은 시세
+                합니다. 취득 부대비용을 비워 두면 실제 초기 투자금은 계산된 실투자금보다
+                큽니다. 정확한 금액을 모른다면{" "}
+                <Link
+                    href="/real-estate/initial-cost-calculator"
+                    className="font-semibold text-brand-600 underline underline-offset-2"
+                >
+                    실투자금 계산기
+                </Link>
+                에서 취득세·중개보수·등기비용을 계산한 뒤 그 값을 넣으면 두 계산기의
+                실투자금 정의가 일치합니다. 입력한 월세·보증금은 시세
                 가정치이므로 인근 실거래 임대료를 확인하고, 임대보증금은 반환해야 할
                 채무라는 점도 함께 고려하세요. 지역별 임대 시세·수익률 동향은
                 한국부동산원(부동산테크·R-ONE) 통계를 참고하면 정확합니다.
@@ -192,6 +205,11 @@ export default function Page() {
                     },
                 ]}
                 relatedCalcs={[
+                    {
+                        label: "실투자금 계산기",
+                        href: "/real-estate/initial-cost-calculator",
+                        icon: "💰",
+                    },
                     {
                         label: "취득세 계산기",
                         href: "/real-estate/acquisition-tax-calculator",
