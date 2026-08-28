@@ -949,11 +949,10 @@ export const blogPosts: BlogPost[] = [
         type: "table",
         headers: ["기관", "주요 역할", "특징"],
         rows: [
-          ["**HUG (주택도시보증공사)**", "전세대출 보증 + 전세보증금반환보증", "공공기관, 보증료 저렴, 보증 한도 명확"],
+          ["**HUG (주택도시보증공사)**", "전세대출 보증 + 전세보증금반환보증", "공공기관. 반환보증 보증료율 연 0.097~0.211%"],
           ["**HF (한국주택금융공사)**", "전세자금대출 보증", "일반·특례·협약·집단 등 상품군. 대상·한도는 상품마다 다름"],
-          ["**SGI 서울보증**", "민간 전세보증보험", "심사 유연, 보증료는 상대적으로 높음"],
         ],
-        caption: "전세 계약 시 \"전세대출 가능 여부\"와 \"전세보증보험 가입 가능 여부\"를 별도로 확인해야 합니다.",
+        caption: "전세 계약 시 \"전세대출 가능 여부\"와 \"전세보증보험 가입 가능 여부\"를 별도로 확인해야 합니다. 이 표 외에 민간 보증보험 상품도 있으므로, 조건은 각 기관에서 직접 비교하세요.",
       },
       {
         type: "callout",
@@ -1044,7 +1043,7 @@ export const blogPosts: BlogPost[] = [
         type: "callout",
         variant: "tip",
         title: "함께 사용하면 좋은 계산기",
-        text: "전세대출 한도와 월 이자 추정은 [전세대출 계산기](/jeonse-loan-calculator), 매수로 전환을 검토 중이라면 [취득세 계산기](/real-estate/acquisition-tax-calculator)와 [부동산 수익률 계산기](/real-estate/property-yield-calculator)를 함께 사용해보세요.",
+        text: "전세대출 한도와 월 이자 추정은 [전세대출 계산기](/jeonse-loan-calculator), 매수로 전환을 검토 중이라면 [취득세 계산기](/real-estate/acquisition-tax-calculator)와 [부동산 수익률 계산기](/real-estate/property-yield-calculator)를 함께 사용해보세요. 기존 전세를 월세로 돌리는 상황이라면 [전월세 전환율 계산기](/real-estate/jeonse-wolse-conversion)를 보세요 — 주택임대차보호법에 전환율 법정 상한(연 10%와 기준금리+대통령령 이율 중 낮은 값)이 있고, 기준금리에 연동돼 움직이므로 현재 값은 계산기에서 확인하는 편이 정확합니다.",
       },
       {
         type: "callout",
