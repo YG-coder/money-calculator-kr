@@ -464,20 +464,16 @@ export default function InitialCostCalc() {
                 purchasePriceWon: priceWon,
                 loanWon,
                 depositWon: rentDepositWon,
+                extraCostWon: result.totalExtraCostWon,
               })}
               className="mt-3 inline-flex items-center gap-1 font-bold text-brand-700 underline underline-offset-2 hover:text-brand-900"
             >
               임대수익률 계산기로 이어서 계산 →
             </Link>
             <p className="mt-1 text-xs text-slate-500">
-              ⚠️ 수익률 계산기의 &lsquo;실투자금&rsquo;은 매입가 − 보증금 −
-              대출금이라 이 화면의 실투자금({formatUnit(result.equityWon)})과
-              달리{" "}
-              <strong>
-                부대비용({formatUnit(result.totalExtraCostWon)})이 빠져
-                있습니다.
-              </strong>{" "}
-              자기자본 수익률은 그만큼 높게 나옵니다.
+              취득 부대비용 {formatUnit(result.totalExtraCostWon)}도 함께
+              전달되어, 수익률 계산기의 실투자금이 이 화면의 실투자금(
+              {formatUnit(result.equityWon)})과 같은 정의로 계산됩니다.
             </p>
           </div>
 

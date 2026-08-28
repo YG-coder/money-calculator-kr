@@ -254,45 +254,89 @@ export interface PropertyYieldResult {
   monthlyInterest: number; // 월 대출 이자 (원)
   monthlyNetIncome: number; // 월 순수익 (원)
   annualNetIncome: number; // 연 순수익 (원)
-  investedCapital: number; // 실투자금 = 매입가 - 보증금 - 대출금 (원)
-  purchaseYield: number; // 매입가 기준 수익률 (%)
-  equityYield: number; // 자기자본 수익률 (%)
+
+  /** 취득 부대비용 (원). 입력하지 않으면 0 */
+  extraCostWon: number;
+  /** 실투자금 = 매입가 + 취득 부대비용 − 보증금 − 대출금 (원) */
+  investedCapital: number;
+  /** 부대비용을 뺀 실투자금 = 매입가 − 보증금 − 대출금 (원). 비교 표시용 */
+  investedCapitalWithoutExtra: number;
+
+  purchaseYield: number; // 매입가 기준 수익률 (%) — 부대비용 미포함
+  /** 자기자본 수익률 (%) — 분모에 부대비용 포함 */
+  equityYield: number;
+  /** 부대비용을 제외한 분모로 계산한 자기자본 수익률 (%). 차이 안내용 */
+  equityYieldWithoutExtra: number;
+
   isInvestedNegative: boolean; // 실투자금이 0 이하인 경우
 }
 
+export interface PropertyYieldInput {
+  purchasePriceMan: number; // 매입가 (만원)
+  depositMan: number; // 임대 보증금 (만원)
+  monthlyRentMan: number; // 월세 (만원)
+  loanAmountMan: number; // 대출금 (만원)
+  loanRatePct: number; // 대출 연 금리 (%)
+  monthlyCostMan: number; // 월 관리·기타비용 (만원)
+  /**
+   * 취득 부대비용 (만원). 취득세·중개보수·등기비용 등 매입 시점의 일회성 비용.
+   *
+   * ⚠️ 생략하면 0 이며, 그때 결과는 이 필드를 추가하기 이전과 완전히 같다.
+   *    실투자금 계산기에서 인계될 때만 값이 채워진다.
+   */
+  extraCostMan?: number;
+}
+
+/**
+ * 월세 임대 기준 수익률.
+ *
+ * ⚠️ 두 가지 '실투자금'
+ *   실투자금 계산기 : 총필요자금(매매가 + 부대비용) − 대출 − 보증금
+ *   이 함수(기존)   : 매입가 − 보증금 − 대출금            ← 부대비용 제외
+ *
+ *   extraCostMan 을 받으면 두 정의가 일치한다. 분모가 커지므로 자기자본
+ *   수익률은 낮아진다(= 더 보수적). 차이를 화면에서 보여줄 수 있도록
+ *   부대비용을 뺀 값도 함께 돌려준다.
+ *
+ * ⚠️ purchaseYield(매입가 기준 수익률)에는 부대비용을 넣지 않는다.
+ *    이름 그대로 매입가 대비 임대료 비율이며, 매물 간 비교용 지표다.
+ */
 export function calcPropertyYield(
-  purchasePriceMan: number, // 매입가 (만원)
-  depositMan: number, // 임대 보증금 (만원)
-  monthlyRentMan: number, // 월세 (만원)
-  loanAmountMan: number, // 대출금 (만원)
-  loanRatePct: number, // 대출 연 금리 (%)
-  monthlyCostMan: number, // 월 관리·기타비용 (만원)
+  input: PropertyYieldInput,
 ): PropertyYieldResult {
-  const priceWon = purchasePriceMan * 10_000;
-  const depWon = depositMan * 10_000;
-  const rentWon = monthlyRentMan * 10_000;
-  const loanWon = loanAmountMan * 10_000;
-  const costWon = monthlyCostMan * 10_000;
+  const priceWon = input.purchasePriceMan * 10_000;
+  const depWon = input.depositMan * 10_000;
+  const rentWon = input.monthlyRentMan * 10_000;
+  const loanWon = input.loanAmountMan * 10_000;
+  const costWon = input.monthlyCostMan * 10_000;
+  const extraCostWon = Math.max(0, input.extraCostMan ?? 0) * 10_000;
 
   const monthlyInterest =
-    loanWon > 0 && loanRatePct > 0 ? (loanWon * loanRatePct) / 100 / 12 : 0;
+    loanWon > 0 && input.loanRatePct > 0
+      ? (loanWon * input.loanRatePct) / 100 / 12
+      : 0;
 
   const monthlyNetIncome = rentWon - monthlyInterest - costWon;
   const annualNetIncome = monthlyNetIncome * 12;
-  const investedCapital = priceWon - depWon - loanWon;
+
+  const investedCapitalWithoutExtra = priceWon - depWon - loanWon;
+  const investedCapital = investedCapitalWithoutExtra + extraCostWon;
 
   const purchaseYield = priceWon > 0 ? ((rentWon * 12) / priceWon) * 100 : 0;
 
-  const equityYield =
-    investedCapital > 0 ? (annualNetIncome / investedCapital) * 100 : 0;
+  const yieldOn = (denominator: number) =>
+    denominator > 0 ? (annualNetIncome / denominator) * 100 : 0;
 
   return {
     monthlyInterest: Math.floor(monthlyInterest),
     monthlyNetIncome: Math.floor(monthlyNetIncome),
     annualNetIncome: Math.floor(annualNetIncome),
+    extraCostWon,
     investedCapital: Math.floor(investedCapital),
+    investedCapitalWithoutExtra: Math.floor(investedCapitalWithoutExtra),
     purchaseYield,
-    equityYield,
+    equityYield: yieldOn(investedCapital),
+    equityYieldWithoutExtra: yieldOn(investedCapitalWithoutExtra),
     isInvestedNegative: investedCapital <= 0,
   };
 }

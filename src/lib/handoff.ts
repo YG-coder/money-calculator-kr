@@ -79,19 +79,25 @@ export function ltvToInitialCostUrl(input: {
 //   loanAmount    : 대출금
 //   deposit       : 임대보증금
 //
-//   ⚠️ 실투자금 계산기의 '실투자금'(부대비용 포함)과 수익률 계산기의
-//      '실투자금'(= 매입가 − 보증금 − 대출금, 부대비용 제외)은 정의가 다르다.
-//      그래서 금액을 그대로 옮기지 않고 **입력 3개만** 넘긴다.
-//      두 값의 차이는 수신 페이지에서 안내한다.
+//   extraCost     : 취득 부대비용 (취득세 + 중개보수 + 등기 + 기타)
+//
+//   ⚠️ 실투자금 금액 자체는 넘기지 않는다. 수익률 계산기에는 실투자금 입력이
+//      없고 입력값에서 파생하기 때문이다. 대신 부대비용을 함께 넘겨
+//      수신 측 분모가 실투자금 계산기와 같은 정의가 되게 한다.
+//
+//        실투자금 계산기 : 총필요자금(매매가 + 부대비용) − 대출 − 보증금
+//        수익률 계산기   : 매입가 + 부대비용 − 보증금 − 대출금   ← 일치
 // ─────────────────────────────────────────────
 export function initialCostToYieldUrl(input: {
   purchasePriceWon: number;
   loanWon: number;
   depositWon: number;
+  extraCostWon: number;
 }): string {
   return buildHandoffUrl(CALC_PATH.propertyYield, {
     purchasePrice: toManwonParam(input.purchasePriceWon),
     loanAmount: toManwonParam(input.loanWon),
     deposit: toManwonParam(input.depositWon),
+    extraCost: toManwonParam(input.extraCostWon),
   });
 }

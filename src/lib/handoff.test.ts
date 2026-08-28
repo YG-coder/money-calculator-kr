@@ -80,23 +80,24 @@ describe("LTV → 실투자금", () => {
 });
 
 describe("실투자금 → 임대수익률", () => {
-  it("매입가·대출금·보증금을 넘긴다", () => {
+  it("매입가·대출금·보증금·취득 부대비용을 넘긴다", () => {
     const url = initialCostToYieldUrl({
       purchasePriceWon: 50_000 * 만원,
       loanWon: 30_000 * 만원,
       depositWon: 5_000 * 만원,
+      extraCostWon: 2_000 * 만원,
     });
     expect(url).toBe(
-      `${CALC_PATH.propertyYield}?purchasePrice=50000&loanAmount=30000&deposit=5000`,
+      `${CALC_PATH.propertyYield}?purchasePrice=50000&loanAmount=30000&deposit=5000&extraCost=2000`,
     );
   });
 
-  it("부대비용을 포함한 실투자금 금액 자체는 넘기지 않는다", () => {
-    // 두 계산기의 '실투자금' 정의가 달라 금액을 그대로 옮기면 안 된다
+  it("실투자금 금액 자체는 넘기지 않는다 — 수신 측이 입력에서 파생한다", () => {
     const url = initialCostToYieldUrl({
       purchasePriceWon: 50_000 * 만원,
       loanWon: 30_000 * 만원,
       depositWon: 0,
+      extraCostWon: 2_000 * 만원,
     });
     expect(url).not.toContain("equity");
     expect(url).not.toContain("invested");
