@@ -15,20 +15,20 @@ import {
 export type OwnershipType = "first" | "second" | "third" | "fourth_plus";
 
 export interface AcquisitionTaxResult {
-  acquisitionTax:  number;   // 취득세 (원)
-  farmSpecialTax:  number;   // 농어촌특별세 (원)
-  localEduTax:     number;   // 지방교육세 (원)
-  totalTax:        number;   // 합계 (원)
-  taxRate:         number;   // 취득세율 (소수, e.g. 0.01)
+  acquisitionTax: number; // 취득세 (원)
+  farmSpecialTax: number; // 농어촌특별세 (원)
+  localEduTax: number; // 지방교육세 (원)
+  totalTax: number; // 합계 (원)
+  taxRate: number; // 취득세율 (소수, e.g. 0.01)
   appliedRule: "standard" | "heavy" | "lowPriceExempt" | "temporaryTwoHouse";
   reductionWon: number;
   totalTaxBeforeReduction: number;
   notes: string[];
   unsupportedReason?: string;
   breakdown: {
-    acquisitionTaxRate: string;   // "1%"
-    farmSpecialTaxRate:  string;
-    localEduTaxRate:     string;
+    acquisitionTaxRate: string; // "1%"
+    farmSpecialTaxRate: string;
+    localEduTaxRate: string;
   };
 }
 
@@ -73,7 +73,9 @@ export interface AcquisitionTaxInput {
   isTemporaryTwoHouse?: boolean;
 }
 
-export function calcAcquisitionTax(input: AcquisitionTaxInput): AcquisitionTaxResult {
+export function calcAcquisitionTax(
+  input: AcquisitionTaxInput,
+): AcquisitionTaxResult {
   const {
     priceMan,
     ownership,
@@ -88,9 +90,11 @@ export function calcAcquisitionTax(input: AcquisitionTaxInput): AcquisitionTaxRe
   } = input;
   const priceWon = priceMan * 10_000;
 
-  const officialPriceWon = exactOfficialPriceWon ??
+  const officialPriceWon =
+    exactOfficialPriceWon ??
     (officialPriceMan === undefined ? undefined : officialPriceMan * 10_000);
-  const lowPriceExempt = ownership !== "first" &&
+  const lowPriceExempt =
+    ownership !== "first" &&
     isMetroArea === false &&
     officialPriceWon !== undefined &&
     officialPriceWon <= NON_METRO_LOW_PRICE_LIMIT_WON &&
@@ -118,16 +122,20 @@ export function calcAcquisitionTax(input: AcquisitionTaxInput): AcquisitionTaxRe
   // 농어촌특별세: 전용 85㎡ 이하 비과세, 초과 시 표준 0.2% / 8%중과 0.6% / 12%중과 1.0%
   let farmSpecialTaxRate = 0;
   if (isOver85) {
-    if (taxRate === 0.12)      farmSpecialTaxRate = 0.01;
+    if (taxRate === 0.12) farmSpecialTaxRate = 0.01;
     else if (taxRate === 0.08) farmSpecialTaxRate = 0.006;
-    else                       farmSpecialTaxRate = 0.002;
+    else farmSpecialTaxRate = 0.002;
   }
 
   const acquisitionTaxBeforeReduction = Math.floor(priceWon * taxRate);
-  const farmSpecialTaxBeforeReduction = Math.floor(priceWon * farmSpecialTaxRate);
+  const farmSpecialTaxBeforeReduction = Math.floor(
+    priceWon * farmSpecialTaxRate,
+  );
   const localEduTaxBeforeReduction = Math.floor(priceWon * localEduTaxRate);
-  const totalTaxBeforeReduction = acquisitionTaxBeforeReduction +
-    farmSpecialTaxBeforeReduction + localEduTaxBeforeReduction;
+  const totalTaxBeforeReduction =
+    acquisitionTaxBeforeReduction +
+    farmSpecialTaxBeforeReduction +
+    localEduTaxBeforeReduction;
 
   const notes: string[] = [];
   let unsupportedReason: string | undefined;
@@ -142,20 +150,26 @@ export function calcAcquisitionTax(input: AcquisitionTaxInput): AcquisitionTaxRe
     } else if (ownership !== "first") {
       notes.push("생애최초 감면은 첫 주택 취득에만 적용합니다.");
     } else if (isOver85) {
-      unsupportedReason = "85㎡ 초과 생애최초 감면은 감면분 농어촌특별세 확인이 필요해 자동 적용하지 않습니다.";
+      unsupportedReason =
+        "85㎡ 초과 생애최초 감면은 감면분 농어촌특별세 확인이 필요해 자동 적용하지 않습니다.";
     } else {
       const limit = firstHomeReductionLimit(firstHomeReduction);
       reductionWon = Math.min(acquisitionTaxBeforeReduction, limit);
-      const reductionRate = acquisitionTaxBeforeReduction > 0
-        ? reductionWon / acquisitionTaxBeforeReduction
-        : 0;
+      const reductionRate =
+        acquisitionTaxBeforeReduction > 0
+          ? reductionWon / acquisitionTaxBeforeReduction
+          : 0;
       acquisitionTax -= reductionWon;
-      localEduTax = Math.floor(localEduTaxBeforeReduction * (1 - reductionRate));
+      localEduTax = Math.floor(
+        localEduTaxBeforeReduction * (1 - reductionRate),
+      );
       farmSpecialTax = 0;
-      notes.push(`생애최초 취득세 감면 ${reductionWon.toLocaleString("ko-KR")}원 적용`);
+      notes.push(
+        `생애최초 취득세 감면 ${reductionWon.toLocaleString("ko-KR")}원 적용`,
+      );
     }
   }
-  const totalTax        = acquisitionTax + farmSpecialTax + localEduTax;
+  const totalTax = acquisitionTax + farmSpecialTax + localEduTax;
 
   const appliedRule = temporaryTwoHouse
     ? "temporaryTwoHouse"
@@ -178,8 +192,8 @@ export function calcAcquisitionTax(input: AcquisitionTaxInput): AcquisitionTaxRe
     unsupportedReason,
     breakdown: {
       acquisitionTaxRate: pctStr(taxRate),
-      farmSpecialTaxRate:  pctStr(farmSpecialTaxRate),
-      localEduTaxRate:     pctStr(localEduTaxRate),
+      farmSpecialTaxRate: pctStr(farmSpecialTaxRate),
+      localEduTaxRate: pctStr(localEduTaxRate),
     },
   };
 }
@@ -189,41 +203,42 @@ export function calcAcquisitionTax(input: AcquisitionTaxInput): AcquisitionTaxRe
 ───────────────────────────────────────────── */
 
 export interface JeonseVsWolseResult {
-  jeonseMonthlyOpportunityCost: number;  // 전세 월 기회비용 (원)
-  wolseMonthlyTotalCost:         number;  // 월세 월 실질 비용 (원)
-  jeonseIsBetter:                boolean;
-  monthlyDiff:                   number;  // 절대값 차이 (원)
-  yearlyDiff:                    number;  // 연간 차이 (원)
-  breakEvenRate:                 number;  // 손익분기 연 이자율 (%)
+  jeonseMonthlyOpportunityCost: number; // 전세 월 기회비용 (원)
+  wolseMonthlyTotalCost: number; // 월세 월 실질 비용 (원)
+  jeonseIsBetter: boolean;
+  monthlyDiff: number; // 절대값 차이 (원)
+  yearlyDiff: number; // 연간 차이 (원)
+  breakEvenRate: number; // 손익분기 연 이자율 (%)
 }
 
 export function calcJeonseVsWolse(
-  jeonseDepositMan: number,  // 전세 보증금 (만원)
-  wolseDepositMan:  number,  // 월세 보증금 (만원)
-  wolseMonthlyMan:  number,  // 월 임대료 (만원)
-  investRatePct:    number,  // 연 이자율 (%, e.g. 3.5)
+  jeonseDepositMan: number, // 전세 보증금 (만원)
+  wolseDepositMan: number, // 월세 보증금 (만원)
+  wolseMonthlyMan: number, // 월 임대료 (만원)
+  investRatePct: number, // 연 이자율 (%, e.g. 3.5)
 ): JeonseVsWolseResult {
   const rMonthly = investRatePct / 100 / 12;
 
-  const jeonseOpp  = jeonseDepositMan * 10_000 * rMonthly;
-  const wolseDeposOpp = wolseDepositMan  * 10_000 * rMonthly;
+  const jeonseOpp = jeonseDepositMan * 10_000 * rMonthly;
+  const wolseDeposOpp = wolseDepositMan * 10_000 * rMonthly;
   const wolseTotal = wolseDeposOpp + wolseMonthlyMan * 10_000;
 
-  const rawDiff        = wolseTotal - jeonseOpp;
+  const rawDiff = wolseTotal - jeonseOpp;
   const jeonseIsBetter = rawDiff > 0;
-  const monthlyDiff    = Math.floor(Math.abs(rawDiff));
-  const yearlyDiff     = monthlyDiff * 12;
+  const monthlyDiff = Math.floor(Math.abs(rawDiff));
+  const yearlyDiff = monthlyDiff * 12;
 
   // 손익분기: jeonseDeposit × r/12 = wolseDeposit × r/12 + wolseMonthly
   // → r = wolseMonthly / (jeonseDeposit − wolseDeposit) × 12 × 100
   const depositDiff = jeonseDepositMan - wolseDepositMan;
-  const breakEvenRate = depositDiff > 0
-    ? Math.round((wolseMonthlyMan / depositDiff) * 12 * 100 * 100) / 100
-    : 0;
+  const breakEvenRate =
+    depositDiff > 0
+      ? Math.round((wolseMonthlyMan / depositDiff) * 12 * 100 * 100) / 100
+      : 0;
 
   return {
     jeonseMonthlyOpportunityCost: Math.floor(jeonseOpp),
-    wolseMonthlyTotalCost:         Math.floor(wolseTotal),
+    wolseMonthlyTotalCost: Math.floor(wolseTotal),
     jeonseIsBetter,
     monthlyDiff,
     yearlyDiff,
@@ -236,47 +251,46 @@ export function calcJeonseVsWolse(
 ───────────────────────────────────────────── */
 
 export interface PropertyYieldResult {
-  monthlyInterest:    number;  // 월 대출 이자 (원)
-  monthlyNetIncome:   number;  // 월 순수익 (원)
-  annualNetIncome:    number;  // 연 순수익 (원)
-  investedCapital:    number;  // 실투자금 = 매입가 - 보증금 - 대출금 (원)
-  purchaseYield:      number;  // 매입가 기준 수익률 (%)
-  equityYield:        number;  // 자기자본 수익률 (%)
+  monthlyInterest: number; // 월 대출 이자 (원)
+  monthlyNetIncome: number; // 월 순수익 (원)
+  annualNetIncome: number; // 연 순수익 (원)
+  investedCapital: number; // 실투자금 = 매입가 - 보증금 - 대출금 (원)
+  purchaseYield: number; // 매입가 기준 수익률 (%)
+  equityYield: number; // 자기자본 수익률 (%)
   isInvestedNegative: boolean; // 실투자금이 0 이하인 경우
 }
 
 export function calcPropertyYield(
-  purchasePriceMan:   number,  // 매입가 (만원)
-  depositMan:         number,  // 임대 보증금 (만원)
-  monthlyRentMan:     number,  // 월세 (만원)
-  loanAmountMan:      number,  // 대출금 (만원)
-  loanRatePct:        number,  // 대출 연 금리 (%)
-  monthlyCostMan:     number,  // 월 관리·기타비용 (만원)
+  purchasePriceMan: number, // 매입가 (만원)
+  depositMan: number, // 임대 보증금 (만원)
+  monthlyRentMan: number, // 월세 (만원)
+  loanAmountMan: number, // 대출금 (만원)
+  loanRatePct: number, // 대출 연 금리 (%)
+  monthlyCostMan: number, // 월 관리·기타비용 (만원)
 ): PropertyYieldResult {
-  const priceWon  = purchasePriceMan * 10_000;
-  const depWon    = depositMan        * 10_000;
-  const rentWon   = monthlyRentMan    * 10_000;
-  const loanWon   = loanAmountMan     * 10_000;
-  const costWon   = monthlyCostMan    * 10_000;
+  const priceWon = purchasePriceMan * 10_000;
+  const depWon = depositMan * 10_000;
+  const rentWon = monthlyRentMan * 10_000;
+  const loanWon = loanAmountMan * 10_000;
+  const costWon = monthlyCostMan * 10_000;
 
   const monthlyInterest =
     loanWon > 0 && loanRatePct > 0 ? (loanWon * loanRatePct) / 100 / 12 : 0;
 
   const monthlyNetIncome = rentWon - monthlyInterest - costWon;
-  const annualNetIncome  = monthlyNetIncome * 12;
-  const investedCapital  = priceWon - depWon - loanWon;
+  const annualNetIncome = monthlyNetIncome * 12;
+  const investedCapital = priceWon - depWon - loanWon;
 
-  const purchaseYield =
-    priceWon > 0 ? ((rentWon * 12) / priceWon) * 100 : 0;
+  const purchaseYield = priceWon > 0 ? ((rentWon * 12) / priceWon) * 100 : 0;
 
   const equityYield =
     investedCapital > 0 ? (annualNetIncome / investedCapital) * 100 : 0;
 
   return {
-    monthlyInterest:    Math.floor(monthlyInterest),
-    monthlyNetIncome:   Math.floor(monthlyNetIncome),
-    annualNetIncome:    Math.floor(annualNetIncome),
-    investedCapital:    Math.floor(investedCapital),
+    monthlyInterest: Math.floor(monthlyInterest),
+    monthlyNetIncome: Math.floor(monthlyNetIncome),
+    annualNetIncome: Math.floor(annualNetIncome),
+    investedCapital: Math.floor(investedCapital),
     purchaseYield,
     equityYield,
     isInvestedNegative: investedCapital <= 0,
@@ -299,9 +313,9 @@ export function calcPropertyYield(
 // (주택임대차보호법 제7조의2 각 호 중 낮은 비율, 시행령 제9조 ①②)
 export const CONVERSION_RATE_INFO = {
   fixedCapPct: 10, // 시행령 제9조① "연 1할" (대통령령상 고정 비율)
-  baseRatePct: 2.75, // 한국은행 기준금리 (2026-07-16 0.25%p 인상)
+  baseRatePct: 3.0, // 한국은행 기준금리 (2026-08-27 금통위 0.25%p 인상, 2회 연속)
   legalAddPct: 2.0, // 시행령 제9조② 대통령령 이율
-  verifiedAt: "2026-08-15", // 다음 금통위: 2026-08-27 (이후 변동 가능)
+  verifiedAt: "2026-08-28", // 다음 금통위: 2026-10-22 (이후 변동 가능)
   source: "한국은행 기준금리 · 주택임대차보호법 제7조의2 · 시행령 제9조",
 };
 

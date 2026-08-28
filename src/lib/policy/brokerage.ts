@@ -4,7 +4,7 @@
 // ⚠️ 정책값만 담습니다. 계산은 @/lib/initialCost 에서 합니다.
 //    값 수정 시 반드시 같은 커밋에서 verifiedAt 과 sources 를 갱신하세요.
 //
-// 조사 근거: 저장소 루트 BROKERAGE-POLICY-2026-08.md (rev.2)
+// 조사 근거: docs/policies/BROKERAGE-POLICY-2026-08.md (rev.2)
 
 import type { PolicyMeta } from "@/lib/policy/types";
 
@@ -30,17 +30,18 @@ export const BROKERAGE_META: PolicyMeta = {
   version: "1.0.0",
   // 요율의 적용 시작일. 조례 버전(2022-12-30 시행, 서울특별시조례 제8585호)과 다릅니다.
   effectiveFrom: "2021-12-30",
-  verifiedAt: "2026-08-25",
+  verifiedAt: "2026-08-28",
   sources: [
     { name: "공인중개사법 제32조 제4항, 같은 법 시행규칙 제20조 [별표 1]" },
     { name: "서울특별시 주택 중개보수 등에 관한 조례 제2조 별표1" },
     { name: "경기부동산포털 중개보수 요율 안내" },
     { name: "한국공인중개사협회 중개보수 요율표" },
+    {
+      name: "국토교통부 「공인중개사법 시행령·시행규칙 개정」 (2026-08-28 시행) — 주택 상한요율 불변 확인",
+      publishedAt: "2026-08-11",
+    },
   ],
-  supported: [
-    "주택 매매·교환 6구간 상한요율과 한도액",
-    "국토교통부 상한 기준",
-  ],
+  supported: ["주택 매매·교환 6구간 상한요율과 한도액", "국토교통부 상한 기준"],
   unsupported: [
     "시·도별 조례 요율차(서울·경기 외 미확인)",
     "주택 임대차 중개보수",
@@ -52,10 +53,12 @@ export const BROKERAGE_META: PolicyMeta = {
   note:
     "현행 서울 조례 버전은 2022-12-30 시행(서울특별시조례 제8585호)이나 별표1의 요율 숫자는 " +
     "2021-12-30 개정값이 유지된다. 표의 값은 상한이며 실제 보수는 이 범위 안에서 협의로 정한다. " +
-    "부가가치세는 별도(일반과세 10%).",
+    "부가가치세는 별도(일반과세 10%). " +
+    "2026-08-28 시행 개정(2026-08-11 공포)은 한국공인중개사협회 법정화, 공동관리비 확인·설명 의무, " +
+    "주거용 오피스텔 중개보수 결정방식 명확화가 내용이며 주택 상한요율 [별표 1] 변경은 확인되지 않았다. " +
+    "(근거 등급 2차 — 국토교통부 보도자료를 인용한 기사 2건. 국가법령정보센터 원문 대조는 하지 못했다)",
   nextReviewHint:
-    "공인중개사법 시행규칙 [별표 1] 개정 시 / 시·도 조례 개정 시. " +
-    "2026-08-28 시행 개정은 요율 불변으로 조사되었으나 시행 후 확인 필요.",
+    "공인중개사법 시행규칙 [별표 1] 개정 시 / 시·도 조례 개정 시.",
 };
 
 // ─────────────────────────────────────────────
@@ -76,10 +79,30 @@ export interface BrokerageBand {
 
 export const SALE_BROKERAGE_BANDS: BrokerageBand[] = [
   { belowWon: 50_000_000, rate: 0.006, capWon: 250_000, label: "5천만원 미만" },
-  { belowWon: 200_000_000, rate: 0.005, capWon: 800_000, label: "5천만원 이상 2억원 미만" },
-  { belowWon: 900_000_000, rate: 0.004, capWon: null, label: "2억원 이상 9억원 미만" },
-  { belowWon: 1_200_000_000, rate: 0.005, capWon: null, label: "9억원 이상 12억원 미만" },
-  { belowWon: 1_500_000_000, rate: 0.006, capWon: null, label: "12억원 이상 15억원 미만" },
+  {
+    belowWon: 200_000_000,
+    rate: 0.005,
+    capWon: 800_000,
+    label: "5천만원 이상 2억원 미만",
+  },
+  {
+    belowWon: 900_000_000,
+    rate: 0.004,
+    capWon: null,
+    label: "2억원 이상 9억원 미만",
+  },
+  {
+    belowWon: 1_200_000_000,
+    rate: 0.005,
+    capWon: null,
+    label: "9억원 이상 12억원 미만",
+  },
+  {
+    belowWon: 1_500_000_000,
+    rate: 0.006,
+    capWon: null,
+    label: "12억원 이상 15억원 미만",
+  },
   { belowWon: null, rate: 0.007, capWon: null, label: "15억원 이상" },
 ];
 
@@ -100,7 +123,9 @@ export interface BrokerageBandResult {
  * 거래금액(원) → 상한요율 기준 최대 중개보수.
  * 매매의 거래금액은 매매가격 그대로입니다.
  */
-export function calcMaxBrokerageFee(dealAmountWon: number): BrokerageBandResult | null {
+export function calcMaxBrokerageFee(
+  dealAmountWon: number,
+): BrokerageBandResult | null {
   if (!(dealAmountWon > 0)) return null;
 
   const band =

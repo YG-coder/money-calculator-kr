@@ -21,9 +21,9 @@ describe("전월세 전환 법정 상한", () => {
     );
   });
 
-  it("현재 상수(기준금리 2.75%)에서 상한은 4.75%", () => {
-    expect(CONVERSION_RATE_INFO.baseRatePct).toBe(2.75);
-    expect(getLegalConversionCapPct()).toBeCloseTo(4.75, 10);
+  it("현재 상수(기준금리 3.0%)에서 상한은 5.0%", () => {
+    expect(CONVERSION_RATE_INFO.baseRatePct).toBe(3.0);
+    expect(getLegalConversionCapPct()).toBeCloseTo(5.0, 10);
   });
 
   it("기준금리가 오르면 상한도 함께 오른다 — 엔진과 헬퍼가 같은 값을 쓴다", () => {
