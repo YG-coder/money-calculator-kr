@@ -80,6 +80,24 @@ export type BlogPost = {
   content: Block[] | string[];
   /** 사이트에 노출 여부. 기본값 true. false면 목록·sitemap·상세에서 모두 제외됩니다. */
   published?: boolean;
+
+  /**
+   * 내용을 마지막으로 검토한 날짜 (YYYY-MM-DD).
+   *
+   * ⚠️ 실제로 사람이 글을 다시 읽고 수치를 확인한 날만 적는다.
+   *    작성일이나 배포일을 대신 넣지 않는다. 확인하지 않은 날짜를 적으면
+   *    신뢰 신호가 아니라 거짓 표기가 된다. 확인 전에는 필드를 생략한다.
+   */
+  reviewedAt?: string;
+
+  /**
+   * 본문 수치의 근거.
+   *
+   * ⚠️ 글이 실제로 근거로 삼은 것만 적는다. 그럴듯한 기관명을 채워 넣지 않는다.
+   *    산식만 다루는 글(예: 원리금균등 vs 원금균등)은 외부 근거가 없는 것이
+   *    정상이므로 생략한다.
+   */
+  sources?: { name: string; url?: string }[];
 };
 
 /**
@@ -101,6 +119,7 @@ export function normalizeContent(content: Block[] | string[]): Block[] {
 export const blogPosts: BlogPost[] = [
   {
     slug: "loan-interest-calculation",
+    sources: [{ name: "한국은행 기준금리" }],
     category: "대출 기초",
     title: "대출 이자 계산 방법 완벽 정리 — 공식부터 실전 비교까지",
     description:
@@ -741,6 +760,11 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: "jeonse-vs-wolse",
+    sources: [
+      { name: "주택도시보증공사(HUG) 전세보증금반환보증" },
+      { name: "한국주택금융공사(HF) 전세자금보증" },
+      { name: "SGI서울보증 전세금보장신용보험" },
+    ],
     category: "부동산 임대",
     title: "전세 vs 월세, 어떤 게 더 유리할까? 기회비용·금리 기준 완벽 분석",
     description:
@@ -1031,6 +1055,18 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: "acquisition-tax-guide",
+    // 본문 세율의 법적 근거. 계산기 정책 레이어(policy/acquisitionTax.ts)가
+    // 1차 확인한 조문과 같다.
+    sources: [
+      {
+        name: "지방세법 제11조·제13조의2·제151조",
+        url: "https://www.law.go.kr/법령/지방세법",
+      },
+      {
+        name: "지방세특례제한법 제36조의3 (생애최초 주택 취득 감면)",
+        url: "https://www.law.go.kr/법령/지방세특례제한법",
+      },
+    ],
     category: "부동산 세금",
     title: "취득세 완벽 가이드 — 1·2·3주택 세율과 계산법",
     description:

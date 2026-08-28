@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 
 export const SITE_NAME = "머니계산기";
+
+/**
+ * 콘텐츠 발행 주체. Article 구조화 데이터의 author·publisher 로 쓴다.
+ *
+ * ⚠️ About 페이지에 실제로 적혀 있는 운영자다. 개인 실명이 확인되지 않았으므로
+ *    Organization 으로 둔다. 없는 사람을 만들어 넣지 않는다.
+ */
+export const SITE_AUTHOR = "Incomelab (인컴랩)";
 export const BASE_URL = "https://머니계산기.kr";
 
 type BuildMetadataOptions = Omit<Partial<Metadata>, "title"> & {
