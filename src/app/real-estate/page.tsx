@@ -63,6 +63,41 @@ const CALCS = [
   },
 ];
 
+// 전세·월세 관련 계산기 — 허브 소그룹용.
+// CALCS 와 항목이 겹치지만 역할이 다르다. CALCS 는 전체 목록이고,
+// 여기는 "전세·월세를 고민 중"이라는 한 가지 상황으로 묶은 것이다.
+// 전세대출 계산기는 /loan 그룹에 있어 CALCS 에는 없지만 이 맥락에는 들어간다.
+const JEONSE_WOLSE_CALCS = [
+  {
+    title: "월세 vs 전세 계산기",
+    desc: "전세 보증금의 기회비용과 월세 총 비용을 비교합니다.",
+    who: "임차인 · 어느 쪽이 유리한지 정할 때",
+    href: "/real-estate/jeonse-vs-wolse-calculator",
+    icon: "⚖️",
+  },
+  {
+    title: "전월세 전환율 계산기",
+    desc: "보증금을 월세로 돌릴 때 적용된 전환율과 법정 상한을 비교합니다.",
+    who: "임차인 · 임대인 · 전환 조건을 확인할 때",
+    href: "/real-estate/jeonse-wolse-conversion",
+    icon: "🔁",
+  },
+  {
+    title: "전세대출 계산기",
+    desc: "보증금·금리·LTV로 대출 한도와 월 이자, 자기 부담금을 계산합니다.",
+    who: "임차인 · 전세 자금을 마련할 때",
+    href: "/jeonse-loan-calculator",
+    icon: "🏠",
+  },
+  {
+    title: "공실률 영향 계산기",
+    desc: "공실이 임대수입과 순수익을 얼마나 줄이는지 계산합니다.",
+    who: "임대인 · 월세를 놓을 때의 위험을 볼 때",
+    href: "/real-estate/vacancy-impact",
+    icon: "🏚️",
+  },
+];
+
 const FAQ = [
   {
     q: "부동산을 살 때 매매가 외에 어떤 비용이 더 드나요?",
@@ -189,6 +224,42 @@ export default function Page() {
             ※ 넘어온 값은 다음 화면에서 수정할 수 있습니다. 등기비용·방공제처럼
             직접 골라야 하는 항목은 자동으로 선택되지 않습니다.
           </p>
+        </div>
+      </section>
+
+      {/* ── 전세·월세 소그룹 ── */}
+      <section className="border-t border-slate-100 bg-white">
+        <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+          <h2 className="mb-2 text-xl font-black text-slate-800">
+            전세·월세 계산기
+          </h2>
+          <p className="mb-6 text-sm leading-relaxed text-slate-600">
+            전세와 월세 사이의 선택, 보증금을 월세로 돌릴 때의 환산, 임대인
+            입장의 공실 위험까지 한 묶음으로 확인할 수 있습니다.
+          </p>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {JEONSE_WOLSE_CALCS.map((c) => (
+              <Link
+                key={c.href}
+                href={c.href}
+                className="group flex gap-4 rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-brand-200 hover:shadow-md"
+              >
+                <span className="text-2xl">{c.icon}</span>
+                <span>
+                  <span className="block font-black text-slate-900 transition-colors group-hover:text-brand-600">
+                    {c.title}
+                  </span>
+                  <span className="mt-1 block text-sm leading-relaxed text-slate-600">
+                    {c.desc}
+                  </span>
+                  <span className="mt-1.5 block text-xs text-slate-500">
+                    {c.who}
+                  </span>
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
