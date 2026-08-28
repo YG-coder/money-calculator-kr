@@ -238,6 +238,10 @@ export const DSR_LIMIT = { bank: 40, nonbank: 50 } as const;
 //   ⚠️ 아래 함수들은 모두 STRESS_RATE.currentPct 하나에서 파생됩니다.
 //      반기 발표로 그 값이 바뀌면 신용대출과 지방 주담대가 함께 움직입니다.
 //      개별 상수(0.75 등)를 따로 박아두지 마세요.
+//
+//   ⚠️ 적용 기간(STRESS_RATE.effectiveUntil)이 지나면 두 함수 모두 null 을
+//      돌려줍니다. 만료된 반기 금리로 계산하면 안 되기 때문입니다.
+//      PolicyMeta.effectiveUntil 의 expired 판정과 런타임 동작이 여기서 일치합니다.
 // ─────────────────────────────────────────────
 
 /** 백분율 계산의 부동소수점 오차 제거 (1.5 × 0.6 = 0.8999… → 0.9) */
@@ -254,10 +258,30 @@ function roundPct(value: number): number {
  * @param fixedTerm 고정금리 기간 구분
  * @param creditTotalWon 신용대출 총잔액(기존 + 신규). 1억원 이하면 0 을 돌려줍니다.
  */
+/**
+ * 반기 스트레스 금리가 기준일에 유효한가.
+ *
+ * ⚠️ STRESS_RATE.currentPct 는 **이번 반기의 산정 결과**다. 적용 기간이 끝나면
+ *    그 값은 더 이상 현행 정책값이 아니다. 다음 발표값을 확인하기 전에는
+ *    계산하지 않는다 — 만료된 금리로 한도를 내면 조용한 오답이 된다.
+ */
+export function isStressRateEffective(asOf: string): boolean {
+  return asOf <= STRESS_RATE.effectiveUntil;
+}
+
+/**
+ * 신용대출의 유효 스트레스 금리(%p).
+ *
+ * ⚠️ 지역 인자를 받지 않는다 (지방 유예는 주담대 한정, 신용대출은 전국 동일).
+ * ⚠️ 반기 적용 기간이 지나면 null 을 돌려준다. 호출부가 계산을 막아야 한다.
+ */
 export function getCreditStressRatePct(params: {
   fixedTerm: CreditFixedTerm;
   creditTotalWon: number;
-}): number {
+  asOf: string;
+}): number | null {
+  if (!isStressRateEffective(params.asOf)) return null;
+
   if (params.creditTotalWon <= CREDIT_STRESS_GATE_WON) return 0;
 
   const ratio = CREDIT_STRESS_RATIO_TABLE.entries.find(
@@ -288,6 +312,10 @@ export function getMortgageStressRatePct(params: {
   region: MortgageRegion;
   asOf: string;
 }): number | null {
+  // 반기 산정 기간이 끝나면 지역과 무관하게 계산하지 않는다.
+  // 수도권 하한 3.0 도 강화 대책의 산물이라 새 정책 확인 전에는 보장되지 않는다.
+  if (!isStressRateEffective(params.asOf)) return null;
+
   if (params.region === "metro") {
     return roundPct(
       Math.max(STRESS_RATE.currentPct, METRO_MORTGAGE_MINIMUM_PCT),

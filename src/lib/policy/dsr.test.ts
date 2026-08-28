@@ -14,9 +14,12 @@ import {
   getCreditStressRatePct,
   getMortgageStressRatePct,
   isLocalDeferralActive,
+  isStressRateEffective,
 } from "@/lib/policy/dsr";
 
 const 억 = 100_000_000;
+const BEFORE = "2026-08-28"; // 반기 적용 기간 내
+const AFTER_HALF = "2027-01-01"; // 반기 적용 기간 종료 후
 
 // STRESS_RATE.currentPct 를 흔들어 파생 전파를 확인하기 위한 헬퍼.
 // as const 라 타입상 읽기전용이므로 캐스팅해서 임시 변경한다.
@@ -54,7 +57,11 @@ describe("두 개의 1억원", () => {
 describe("신용대출 게이팅", () => {
   it("총잔액 1억원 이하면 스트레스 미적용", () => {
     expect(
-      getCreditStressRatePct({ fixedTerm: "other", creditTotalWon: 1 * 억 }),
+      getCreditStressRatePct({
+        fixedTerm: "other",
+        creditTotalWon: 1 * 억,
+        asOf: BEFORE,
+      }),
     ).toBe(0);
   });
 
@@ -63,6 +70,7 @@ describe("신용대출 게이팅", () => {
       getCreditStressRatePct({
         fixedTerm: "other",
         creditTotalWon: 1 * 억 + 1,
+        asOf: BEFORE,
       }),
     ).toBe(1.5);
   });
@@ -74,6 +82,7 @@ describe("신용대출 게이팅", () => {
       getCreditStressRatePct({
         fixedTerm: "other",
         creditTotalWon: 기존 + 신규,
+        asOf: BEFORE,
       }),
     ).toBe(1.5);
   });
@@ -84,19 +93,31 @@ describe("신용대출 금리유형별 적용비율", () => {
 
   it("5년 이상 고정 → 0% (1억 초과여도 가산 없음)", () => {
     expect(
-      getCreditStressRatePct({ fixedTerm: "fixed5plus", creditTotalWon: 초과 }),
+      getCreditStressRatePct({
+        fixedTerm: "fixed5plus",
+        creditTotalWon: 초과,
+        asOf: BEFORE,
+      }),
     ).toBe(0);
   });
 
   it("3~5년 고정 → 60% = 0.9%p", () => {
     expect(
-      getCreditStressRatePct({ fixedTerm: "fixed3to5", creditTotalWon: 초과 }),
+      getCreditStressRatePct({
+        fixedTerm: "fixed3to5",
+        creditTotalWon: 초과,
+        asOf: BEFORE,
+      }),
     ).toBe(0.9);
   });
 
   it("그 밖 → 100% = 1.5%p", () => {
     expect(
-      getCreditStressRatePct({ fixedTerm: "other", creditTotalWon: 초과 }),
+      getCreditStressRatePct({
+        fixedTerm: "other",
+        creditTotalWon: 초과,
+        asOf: BEFORE,
+      }),
     ).toBe(1.5);
   });
 
@@ -124,10 +145,18 @@ describe("지역 격리 — 지방 유예는 주담대 한정", () => {
     // getCreditStressRatePct 시그니처에 region 이 없다는 것이 핵심.
     // 지방이라고 0.75 로 깎이지 않는다.
     expect(
-      getCreditStressRatePct({ fixedTerm: "other", creditTotalWon: 2 * 억 }),
+      getCreditStressRatePct({
+        fixedTerm: "other",
+        creditTotalWon: 2 * 억,
+        asOf: BEFORE,
+      }),
     ).toBe(1.5);
     expect(
-      getCreditStressRatePct({ fixedTerm: "other", creditTotalWon: 2 * 억 }),
+      getCreditStressRatePct({
+        fixedTerm: "other",
+        creditTotalWon: 2 * 억,
+        asOf: BEFORE,
+      }),
     ).not.toBe(0.75);
   });
 });
@@ -145,10 +174,33 @@ describe("지방 유예 만료", () => {
     ).toBeNull();
   });
 
-  it("만료되어도 수도권은 영향 없다", () => {
+  it("반기 적용 기간이 끝나면 수도권도 null 이다", () => {
+    // PolicyMeta 의 expired 판정과 런타임 동작을 일치시킨다.
+    // 만료된 반기 금리로 계산하면 한도가 실제와 달라진다.
     expect(
-      getMortgageStressRatePct({ region: "metro", asOf: "2027-01-01" }),
+      getMortgageStressRatePct({ region: "metro", asOf: AFTER_HALF }),
+    ).toBeNull();
+  });
+
+  it("적용 기간 마지막 날까지는 수도권이 3.0 이다", () => {
+    expect(
+      getMortgageStressRatePct({ region: "metro", asOf: "2026-12-31" }),
     ).toBe(3.0);
+  });
+
+  it("반기 적용 기간이 끝나면 신용대출도 null 이다", () => {
+    expect(
+      getCreditStressRatePct({
+        fixedTerm: "other",
+        creditTotalWon: 2 * 억,
+        asOf: AFTER_HALF,
+      }),
+    ).toBeNull();
+  });
+
+  it("isStressRateEffective 는 적용 종료일 당일까지 true", () => {
+    expect(isStressRateEffective("2026-12-31")).toBe(true);
+    expect(isStressRateEffective("2027-01-01")).toBe(false);
   });
 });
 
@@ -157,12 +209,17 @@ describe("단일 출처 파생 — 반기 스트레스 금리 변경 전파", ()
     mutable.currentPct = 2.0;
 
     expect(
-      getCreditStressRatePct({ fixedTerm: "other", creditTotalWon: 2 * 억 }),
+      getCreditStressRatePct({
+        fixedTerm: "other",
+        creditTotalWon: 2 * 억,
+        asOf: BEFORE,
+      }),
     ).toBe(2.0);
     expect(
       getCreditStressRatePct({
         fixedTerm: "fixed3to5",
         creditTotalWon: 2 * 억,
+        asOf: BEFORE,
       }),
     ).toBe(1.2); // 2.0 × 60%
     expect(

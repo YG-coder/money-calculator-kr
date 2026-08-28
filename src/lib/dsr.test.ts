@@ -109,14 +109,40 @@ describe("지방 유예 만료 — 값을 추정하지 않는다", () => {
     }
   });
 
-  it("만료 후에도 수도권은 계산된다", () => {
+  it("반기 적용 기간이 끝나면 수도권도 차단한다", () => {
+    // 2027-01-01 은 지방 유예 만료일이자 반기 적용 종료일 다음 날이다.
+    // 만료된 반기 금리로 계산하면 안 되므로 지역과 무관하게 막는다.
+    const out = getEffectiveStressRate({
+      region: "metro",
+      rateType: "variable",
+      asOf: AFTER_EXPIRY,
+    });
+    expect(out.status).toBe("unsupported");
+    if (out.status === "unsupported") {
+      expect(out.reason).toContain("스트레스 금리 적용 기간");
+      expect(out.reason).toContain("6월·12월");
+    }
+  });
+
+  it("반기 적용 기간이 끝나면 순수고정형도 차단한다", () => {
+    // '순수고정은 스트레스 0' 도 현행 행정지도의 규율이라
+    // 다음 발표를 확인하기 전에는 유지된다고 단정할 수 없다.
+    const out = getEffectiveStressRate({
+      region: "metro",
+      rateType: "fixed",
+      asOf: AFTER_EXPIRY,
+    });
+    expect(out.status).toBe("unsupported");
+  });
+
+  it("적용 기간 안에서는 순수고정형이 0%p 로 계산된다", () => {
     expect(
       getEffectiveStressRate({
-        region: "metro",
-        rateType: "variable",
-        asOf: AFTER_EXPIRY,
+        region: "local",
+        rateType: "fixed",
+        asOf: BEFORE_EXPIRY,
       }),
-    ).toEqual({ status: "ok", value: 3.0 });
+    ).toEqual({ status: "ok", value: 0 });
   });
 
   it("calcDsr 도 만료 시 결과 대신 사유를 돌려준다", () => {
@@ -297,8 +323,21 @@ describe("신용대출 게이팅 — 기존 + 신규 합산", () => {
       getCreditEffectiveStressRate({
         fixedTerm: "other",
         creditTotalWon: 2 * 억,
+        asOf: BEFORE_EXPIRY,
       }),
-    ).toBe(1.5);
+    ).toEqual({ status: "ok", value: 1.5 });
+  });
+
+  it("반기 적용 기간이 끝나면 신용대출도 차단한다", () => {
+    const out = getCreditEffectiveStressRate({
+      fixedTerm: "other",
+      creditTotalWon: 2 * 억,
+      asOf: AFTER_EXPIRY,
+    });
+    expect(out.status).toBe("unsupported");
+    if (out.status === "unsupported") {
+      expect(out.reason).toContain("스트레스 금리 적용 기간");
+    }
   });
 });
 

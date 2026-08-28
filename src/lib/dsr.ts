@@ -31,6 +31,8 @@ import {
   DSR_POLICY_META,
   getMortgageStressRatePct,
   getCreditStressRatePct,
+  isStressRateEffective,
+  STRESS_RATE,
   CREDIT_ASSESSMENT_TERM_YEARS,
   CREDIT_STRESS_GATE_WON,
   LOCAL_MORTGAGE_DEFERRAL_UNTIL,
@@ -103,22 +105,44 @@ export function getEffectiveStressRate(params: {
   rateType: RateType;
   asOf?: string;
 }): DsrOutcome<number> {
-  if (params.rateType === "fixed") return { status: "ok", value: 0 };
-
   const asOf = params.asOf ?? todayKst();
+
+  // 반기 적용 기간이 끝나면 금리유형과 무관하게 계산하지 않는다.
+  // "순수고정은 스트레스 0" 도 현행 행정지도의 규율이므로, 다음 발표를
+  // 확인하기 전에는 그 규율이 유지된다고 단정할 수 없다.
+  if (!isStressRateEffective(asOf)) {
+    return { status: "unsupported", reason: STRESS_EXPIRED_REASON };
+  }
+
+  if (params.rateType === "fixed") return { status: "ok", value: 0 };
   const pct = getMortgageStressRatePct({ region: params.region, asOf });
 
   if (pct === null) {
-    return {
-      status: "unsupported",
-      reason:
-        `지방(비규제) 주택담보대출의 스트레스 금리 유예가 ${LOCAL_MORTGAGE_DEFERRAL_UNTIL}자로 종료되어, ` +
-        "현재 적용 기준을 확인하기 전에는 계산하지 않습니다. 금융회사 또는 금융위원회 공시로 확인하세요.",
-    };
+    // 두 가지 만료가 겹칠 수 있어 사유를 나눈다.
+    //   ① 반기 스트레스 금리 적용 기간 종료 — 지역 무관
+    //   ② 지방 주담대 유예 종료 — 지방만
+    const reason = !isStressRateEffective(asOf)
+      ? STRESS_EXPIRED_REASON
+      : `지방(비규제) 주택담보대출의 스트레스 금리 유예가 ${LOCAL_MORTGAGE_DEFERRAL_UNTIL}자로 종료되어, ` +
+        "현재 적용 기준을 확인하기 전에는 계산하지 않습니다. 금융회사 또는 금융위원회 공시로 확인하세요.";
+
+    return { status: "unsupported", reason };
   }
 
   return { status: "ok", value: pct };
 }
+
+/**
+ * 반기 스트레스 금리 만료 시 공통 사유.
+ *
+ * 스트레스 금리는 6월·12월에 발표되어 이후 6개월 적용된다. 적용 기간이 끝나면
+ * 그 값은 현행 정책값이 아니므로 수도권·지방·신용대출 **전부** 계산하지 않는다.
+ * (PolicyMeta 의 expired 판정과 런타임 동작을 일치시키기 위한 처리)
+ */
+const STRESS_EXPIRED_REASON =
+  `스트레스 금리 적용 기간(${STRESS_RATE.applicableHalf}, ~${STRESS_RATE.effectiveUntil})이 끝났습니다. ` +
+  "스트레스 금리는 6월·12월에 새로 발표되며, 다음 발표값을 확인하기 전에는 계산하지 않습니다. " +
+  "만료된 금리로 계산하면 한도가 실제와 달라집니다. 금융회사 또는 금융위원회 공시로 확인하세요.";
 
 // ─────────────────────────────────────────────
 // 유효 스트레스 금리(%p) — 신용대출
@@ -126,12 +150,23 @@ export function getEffectiveStressRate(params: {
 //   ⚠️ 지역 인자를 받지 않습니다. 지방 유예는 주담대 한정이며
 //      신용대출 스트레스는 전국 동일합니다.
 //   게이팅: 신용대출 총잔액(기존 + 신규)이 1억원을 넘을 때만 적용됩니다.
+//   ⚠️ 반기 적용 기간이 지나면 계산하지 않고 사유를 돌려줍니다.
 // ─────────────────────────────────────────────
 export function getCreditEffectiveStressRate(params: {
   fixedTerm: CreditFixedTerm;
   creditTotalWon: number;
-}): number {
-  return getCreditStressRatePct(params);
+  asOf?: string;
+}): DsrOutcome<number> {
+  const pct = getCreditStressRatePct({
+    fixedTerm: params.fixedTerm,
+    creditTotalWon: params.creditTotalWon,
+    asOf: params.asOf ?? todayKst(),
+  });
+
+  if (pct === null) {
+    return { status: "unsupported", reason: STRESS_EXPIRED_REASON };
+  }
+  return { status: "ok", value: pct };
 }
 
 // ─────────────────────────────────────────────
@@ -390,10 +425,14 @@ function resolveNewLoan(
 
   // ── 신용대출 ──
   const creditTotalWon = existingCreditTotal + loan.amount;
-  const stressPct = getCreditEffectiveStressRate({
+  const stress = getCreditEffectiveStressRate({
     fixedTerm: loan.fixedTerm,
     creditTotalWon,
+    asOf,
   });
+  if (stress.status === "unsupported") return stress;
+
+  const stressPct = stress.value;
   const creditGatePassed = creditTotalWon > CREDIT_STRESS_GATE_WON;
 
   const notes: string[] = [];
@@ -662,10 +701,14 @@ export function estimatePrincipalFromDsr(
   const pNoStress = availableForNew / creditUnitAnnualDebt(loan.ratePercent);
 
   // 구간 2: 스트레스 적용 (총잔액 > 1억원)
-  const stressPct = getCreditEffectiveStressRate({
+  const stress = getCreditEffectiveStressRate({
     fixedTerm: loan.fixedTerm,
     creditTotalWon: CREDIT_STRESS_GATE_WON + 1, // 게이팅 통과 가정
+    asOf: input.asOf,
   });
+  if (stress.status === "unsupported") return stress;
+
+  const stressPct = stress.value;
   const pStressed =
     availableForNew / creditUnitAnnualDebt(loan.ratePercent + stressPct);
 
