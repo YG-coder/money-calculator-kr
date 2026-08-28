@@ -12,7 +12,7 @@
 // ⚠️ 등기·법무 비용은 자동 계산하지 않는다. 국민주택채권 할인율이 매일 바뀌어
 //    정적 사이트에 상수화하면 그날부터 틀린 값이 된다. 사용자가 명시적으로
 //    '직접 입력' 또는 '포함하지 않음' 을 골라야 계산한다.
-//    상세: 저장소 루트 BROKERAGE-POLICY-2026-08.md
+//    상세: docs/policies/BROKERAGE-POLICY-2026-08.md
 
 import type { PolicyMeta } from "@/lib/policy/types";
 import {

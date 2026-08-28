@@ -19,7 +19,7 @@
 //
 //   ⚠️ 절대한도를 차감 '전' 값에 씌우면(A안) 절대한도가 걸리는 구간에서 한도가
 //      과소 계산된다. 회귀 케이스는 lib/ltv.test.ts 참조.
-//   상세: 저장소 루트 LTV-POLICY-2026-08.md 4.4절
+//   상세: docs/policies/LTV-POLICY-2026-08.md 4.4절
 // ─────────────────────────────────────────────────────────────
 
 import { lookupPolicy, type PolicyMeta } from "@/lib/policy/types";

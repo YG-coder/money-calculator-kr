@@ -4,7 +4,7 @@
 // ⚠️ 이 파일은 정책값만 담습니다. 계산은 @/lib/ltv 에서 합니다.
 //    값을 수정할 때는 반드시 같은 커밋에서 verifiedAt 과 sources 를 갱신하세요.
 //
-// 조사 근거: 저장소 루트 LTV-POLICY-2026-08.md (rev.4)
+// 조사 근거: docs/policies/LTV-POLICY-2026-08.md (rev.4)
 
 import type { PolicyMeta, PolicyTable } from "@/lib/policy/types";
 
