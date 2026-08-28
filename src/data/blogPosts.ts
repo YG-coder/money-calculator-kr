@@ -763,13 +763,19 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: "jeonse-vs-wolse",
-    // HUG·SGI 는 공식 원문 주소를 확인하기 전까지 넣지 않는다.
     // 본문의 기관별 보증료·한도·대상 설명은 정책에 따라 바뀌므로
-    // 실제 원문을 확인한 뒤 붙여야 한다.
+    // 실제 원문을 확인한 것만 넣는다.
+    //
+    // SGI 서울보증은 2026-08-28 확인 시점에 상품 페이지가 클라이언트 렌더링이라
+    // 주소가 그 상품을 가리키는지 원문으로 확인하지 못했다. 확인 전까지 넣지 않는다.
     sources: [
       {
         name: "한국주택금융공사(HF) 전세자금보증",
         url: "https://www.hf.go.kr/ko/sub02/sub02_01_01.do",
+      },
+      {
+        name: "주택도시보증공사(HUG) 전세보증금반환보증 상품개요",
+        url: "https://www.khug.or.kr/hug/web/ig/dr/igdr000001.jsp",
       },
     ],
     category: "부동산 임대",
