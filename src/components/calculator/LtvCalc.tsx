@@ -274,9 +274,10 @@ export default function LtvCalc() {
           <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 text-sm text-blue-900">
             <p className="font-bold">소득 기준 한도도 함께 확인하세요</p>
             <p className="mt-2 leading-relaxed">
-              실제 대출 한도는 담보 기준 한도와{" "}
-              <strong>DSR 기준 한도 중 낮은 쪽</strong>으로 정해집니다. 이
-              계산기는 담보 축만 계산합니다.
+              <strong>담보 기준(LTV)과 소득 기준(DSR)을 모두 충족</strong>해야
+              하며, 실제 승인 한도는 금융회사 심사·담보평가·상품별 한도 등에
+              따라 두 계산 결과보다 낮을 수 있습니다. 이 계산기는 담보 축만
+              계산합니다.
             </p>
             <Link
               href={CALC_PATH.dsr}

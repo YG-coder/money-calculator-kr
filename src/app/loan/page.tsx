@@ -318,7 +318,9 @@ export default function Page() {
               >
                 LTV(담보 기준)
               </Link>{" "}
-              중 낮은 쪽으로 정해집니다.
+              기준을 모두 충족해야 하며, 실제 승인 한도는 금융회사
+              심사·담보평가·상품별 한도 등에 따라 두 계산 결과보다 낮을 수
+              있습니다.
             </li>
             <li>
               <strong className="text-slate-800">중도상환 수수료</strong> — 미리

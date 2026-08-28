@@ -180,7 +180,7 @@ export default function Page() {
               {
                 step: "1",
                 title: "얼마나 빌릴 수 있나",
-                desc: "담보 기준 한도(LTV)와 소득 기준 한도(DSR) 중 낮은 쪽이 실제 한도입니다.",
+                desc: "DSR과 LTV 기준을 모두 충족해야 하며, 실제 승인 한도는 금융회사 심사·담보평가·상품별 한도 등에 따라 두 계산 결과보다 낮을 수 있습니다.",
                 href: "/ltv-calculator",
                 label: "LTV 계산기",
               },

@@ -490,9 +490,10 @@ export default function InitialCostCalc() {
           <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 text-sm text-blue-900">
             <p className="font-bold">대출 한도도 함께 확인하세요</p>
             <p className="mt-2 leading-relaxed">
-              대출금은 담보 기준 한도(LTV)와 소득 기준 한도(DSR) 중 낮은 쪽으로
-              정해집니다. LTV 계산기와 DSR 계산기에서 확인한 금액을 위 대출금
-              칸에 넣어보세요.
+              대출금은 담보 기준(LTV)과 소득 기준(DSR)을 모두 충족해야 하며,
+              실제 승인 한도는 금융회사 심사·담보평가·상품별 한도 등에 따라 두
+              계산 결과보다 낮을 수 있습니다. 두 계산기에서 확인한 금액을 위
+              대출금 칸에 넣어보세요.
             </p>
           </div>
 
