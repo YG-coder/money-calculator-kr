@@ -6,7 +6,7 @@
 //    모든 수치는 @/lib/policy/dsr 에서 가져옵니다.
 //    값을 고쳐야 한다면 이 파일이 아니라 정책 파일을 고치세요.
 //
-// 조사 근거: 프로젝트 문서 claude/DSR-POLICY-2026-08.md (rev.2)
+// 조사 근거: docs/policies/DSR-POLICY-2026-08.md (rev.3)
 //
 // 범위
 //   신규 대출 : 주택담보대출 | 신용대출
@@ -196,8 +196,16 @@ export function calcCreditAnnualDebtService(
 export interface ExistingDebtInput {
   /** 기타 부채의 DSR 산정용 연간 원리금 — 사용자 직접 입력 */
   otherAnnualDebt: number;
-  /** 기존 일시상환 신용대출 잔액 (적격 분할상환은 실제 연간 원리금으로 입력) */
+  /** 기존 일시상환 신용대출 잔액 */
   creditBalance: number;
+  /**
+   * 기존 적격 분할상환 신용대출 잔액.
+   *
+   * ⚠️ 게이팅(신용대출 총잔액 1억원) 판정에만 합산하고, 연간 원리금은 계산하지 않는다.
+   *    실제만기 인정 요건·원금 산식의 1차 원문을 확인하지 못했으므로(정책문서 rev.2 §6)
+   *    실제 연간 원리금은 otherAnnualDebt 로 직접 입력받는다.
+   */
+  creditInstallmentBalance: number;
   /** 기존 마이너스통장 약정한도 — 사용액이 아니라 한도 전액 */
   creditLineLimit: number;
   /** 기존 신용대출·마이너스통장의 평균 금리(%) */
@@ -212,8 +220,10 @@ export interface ExistingDebtBreakdown {
   otherAnnualDebt: number;
   creditAnnualDebt: number;
   jeonseAnnualDebt: number;
-  /** 신용대출 게이팅 판정에 쓰는 기존 신용대출 총잔액 (원) */
+  /** 신용대출 게이팅 판정에 쓰는 기존 신용대출 총잔액 (원) — 적격 분할상환 잔액 포함 */
   existingCreditTotal: number;
+  /** 그중 적격 분할상환 잔액. 연간 원리금 산정에는 쓰지 않는다. */
+  installmentBalance: number;
   /** 전세대출이 0원으로 잡힌 이유 — '없음'과 '무주택 제외'를 구분해 표시한다 */
   jeonseNote: string | null;
   warnings: string[];
@@ -243,12 +253,17 @@ export function resolveExistingDebt(
     };
   }
 
-  const existingCreditTotal = input.creditBalance + input.creditLineLimit;
+  // 연간 원리금을 자동 산정하는 대상 — 일시상환 + 마이너스통장
+  const servicedCreditPrincipal = input.creditBalance + input.creditLineLimit;
+
+  // 게이팅 판정 대상 — 여기에는 적격 분할상환 잔액까지 더한다
+  const installmentBalance = Math.max(0, input.creditInstallmentBalance);
+  const existingCreditTotal = servicedCreditPrincipal + installmentBalance;
 
   const creditAnnualDebt =
-    existingCreditTotal > 0
+    servicedCreditPrincipal > 0
       ? calcCreditAnnualDebtService(
-          existingCreditTotal,
+          servicedCreditPrincipal,
           input.creditRatePercent,
         )
       : 0;
@@ -266,7 +281,9 @@ export function resolveExistingDebt(
           : null;
 
   const warnings: string[] = [];
-  if (input.otherAnnualDebt > 0 && existingCreditTotal > 0) {
+  // ⚠️ '기타 부채 원리금 + 적격 분할상환 잔액'은 의도된 정상 조합이므로 경고하지 않는다.
+  //    중복 위험은 연간 원리금을 자동 산정하는 대상(일시상환·마이너스통장)에만 있다.
+  if (input.otherAnnualDebt > 0 && servicedCreditPrincipal > 0) {
     warnings.push(
       "'기타 부채 연간 원리금'과 '기존 신용대출'을 함께 입력하셨습니다. " +
         "기타 부채 금액에 신용대출·마이너스통장이 이미 포함돼 있다면 같은 빚이 두 번 더해집니다. " +
@@ -287,6 +304,7 @@ export function resolveExistingDebt(
       creditAnnualDebt,
       jeonseAnnualDebt,
       existingCreditTotal,
+      installmentBalance,
       jeonseNote,
       warnings,
     },
@@ -435,6 +453,25 @@ function resolveNewLoan(
   };
 }
 
+/**
+ * 신규 대출이 신용대출일 때, 기타 부채에 숨은 분할상환 신용대출 때문에
+ * 1억원 게이팅이 과소 판정되는 것을 막기 위한 조건부 안내.
+ *
+ * 적격 분할상환 잔액을 이미 입력했다면 안내하지 않는다.
+ */
+function buildInstallmentGateHints(
+  newLoan: NewLoanInput,
+  b: ExistingDebtBreakdown,
+): string[] {
+  if (newLoan.kind !== "credit") return [];
+  if (b.otherAnnualDebt <= 0) return [];
+  if (b.installmentBalance > 0) return [];
+  return [
+    "기타 부채에 분할상환 신용대출의 원리금이 포함되어 있다면, 해당 대출 잔액도 " +
+      "'적격 분할상환 신용대출 잔액'에 입력해야 신용대출 총잔액 1억원 판정에 반영됩니다.",
+  ];
+}
+
 // ─────────────────────────────────────────────
 // 모드 A: DSR 확인
 // ─────────────────────────────────────────────
@@ -510,7 +547,7 @@ export function calcDsr(input: DsrCheckInput): DsrOutcome<DsrCheckResult> {
       creditGatePassed: n.creditGatePassed,
       creditTotalWon: n.creditTotalWon,
       notes: n.notes,
-      warnings: b.warnings,
+      warnings: [...b.warnings, ...buildInstallmentGateHints(input.newLoan, b)],
     },
   };
 }
@@ -569,7 +606,7 @@ export function estimatePrincipalFromDsr(
     allowedAnnualDebt,
     availableForNew,
     breakdown: b,
-    warnings: b.warnings,
+    warnings: [...b.warnings, ...buildInstallmentGateHints(input.newLoan, b)],
   };
 
   // ── 주택담보대출 ──

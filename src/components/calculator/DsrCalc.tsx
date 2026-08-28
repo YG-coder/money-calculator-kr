@@ -32,6 +32,7 @@ const FIELDS = [
   { key: "existingDebt", kind: "money" as const, defaultValue: "" },
   { key: "creditBalance", kind: "money" as const, defaultValue: "" },
   { key: "creditLineLimit", kind: "money" as const, defaultValue: "" },
+  { key: "creditInstallmentBalance", kind: "money" as const, defaultValue: "" },
   { key: "creditRate", kind: "decimal" as const, defaultValue: "" },
   { key: "jeonseInterest", kind: "money" as const, defaultValue: "" },
   { key: "amount", kind: "money" as const, defaultValue: "" },
@@ -72,6 +73,7 @@ export default function DsrCalc() {
       otherAnnualDebt: readWon(state, "existingDebt"),
       creditBalance: readWon(state, "creditBalance"),
       creditLineLimit: readWon(state, "creditLineLimit"),
+      creditInstallmentBalance: readWon(state, "creditInstallmentBalance"),
       creditRatePercent: readNum(state, "creditRate"),
       jeonse: jeonseInput,
     };
@@ -211,9 +213,18 @@ export default function DsrCalc() {
             suffix="%"
             step={0.1}
             placeholder="예: 5.5"
-            hint="위 두 금액에 적용할 평균 금리. 산정만기 5년 기준입니다. 분할상환 신용대출은 실제 연간 원리금을 위의 '기타 부채'에 입력하세요."
+            hint="위 두 금액에 적용할 평균 금리. 산정만기 5년 기준으로 연간 원리금을 계산합니다."
             value={state.creditRate?.value ?? ""}
             onChange={(v) => setValue("creditRate", v)}
+          />
+          <InputField
+            label="적격 분할상환 신용대출 잔액"
+            name="creditInstallmentBalance"
+            suffix="만원"
+            placeholder="예: 8,000"
+            hint="스트레스 금리 적용 여부를 판단하는 총잔액에만 합산합니다. 실제 연간 원리금은 위 '기타 부채 연간 원리금'에 입력하세요."
+            value={state.creditInstallmentBalance?.value ?? ""}
+            onChange={(v) => setValue("creditInstallmentBalance", v)}
           />
         </div>
 

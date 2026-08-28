@@ -30,6 +30,7 @@ const NO_EXISTING: ExistingDebtInput = {
   otherAnnualDebt: 0,
   creditBalance: 0,
   creditLineLimit: 0,
+  creditInstallmentBalance: 0,
   creditRatePercent: 0,
   jeonse: { status: "none" },
 };
@@ -531,6 +532,7 @@ describe("기존 부채 합산", () => {
       otherAnnualDebt: 600 * 만원,
       creditBalance: 3_000 * 만원,
       creditLineLimit: 2_000 * 만원,
+      creditInstallmentBalance: 0,
       creditRatePercent: 6,
       jeonse: { status: "oneHouseMetro", annualInterest: 300 * 만원 },
     });
@@ -559,5 +561,183 @@ describe("기준일", () => {
         asOf: todayKst(),
       }),
     );
+  });
+});
+
+describe("적격 분할상환 잔액 — 게이팅에만 합산", () => {
+  const base = {
+    annualIncome: 10_000 * 만원,
+    limitPercent: 40,
+    asOf: BEFORE_EXPIRY,
+  };
+  const 신규신용대출: NewLoanInput = {
+    kind: "credit",
+    amount: 5_000 * 만원,
+    ratePercent: 5.5,
+    repaymentKind: "lumpSum",
+    fixedTerm: "other",
+  };
+  /** 8,000만원 분할상환 신용대출의 실제 연간 원리금(사용자 입력값 가정) */
+  const 분할상환_연간원리금 = 1_800 * 만원;
+
+  it("1. 기존 적격 분할상환 8천 + 신규 신용대출 5천 → 총잔액 1.3억, 스트레스 적용", () => {
+    const r = okCheck({
+      ...base,
+      existing: {
+        ...NO_EXISTING,
+        otherAnnualDebt: 분할상환_연간원리금,
+        creditInstallmentBalance: 8_000 * 만원,
+      },
+      newLoan: 신규신용대출,
+    });
+
+    expect(r.creditTotalWon).toBe(130_000_000);
+    expect(r.creditGatePassed).toBe(true);
+    expect(r.effectiveStressRate).toBe(1.5);
+  });
+
+  it("2. 적격 분할상환 잔액은 연간 원리금에 자동 합산되지 않는다", () => {
+    const r = okCheck({
+      ...base,
+      existing: {
+        ...NO_EXISTING,
+        otherAnnualDebt: 분할상환_연간원리금,
+        creditInstallmentBalance: 8_000 * 만원,
+        creditRatePercent: 5.5,
+      },
+      newLoan: 신규신용대출,
+    });
+
+    // 게이팅에는 들어가지만 원리금은 0
+    expect(r.breakdown.installmentBalance).toBe(8_000 * 만원);
+    expect(r.breakdown.creditAnnualDebt).toBe(0);
+    // 기존 부채는 사용자가 입력한 연간 원리금 그대로
+    expect(r.existingAnnualDebt).toBe(분할상환_연간원리금);
+  });
+
+  it("2-b. 잔액을 넣어도 넣지 않아도 기존 연간 원리금은 같다 (게이팅만 달라진다)", () => {
+    const 공통 = {
+      ...NO_EXISTING,
+      otherAnnualDebt: 분할상환_연간원리금,
+      creditRatePercent: 5.5,
+    };
+    const 미입력 = okCheck({ ...base, existing: 공통, newLoan: 신규신용대출 });
+    const 입력 = okCheck({
+      ...base,
+      existing: { ...공통, creditInstallmentBalance: 8_000 * 만원 },
+      newLoan: 신규신용대출,
+    });
+
+    expect(입력.existingAnnualDebt).toBe(미입력.existingAnnualDebt);
+    expect(미입력.creditGatePassed).toBe(false); // 5천만원만 보임 — 과소 판정
+    expect(입력.creditGatePassed).toBe(true); // 1.3억 — 정확
+    expect(입력.dsrStressed).toBeGreaterThan(미입력.dsrStressed);
+  });
+
+  it("3. 기타 부채 원리금 + 적격 분할상환 잔액 조합에는 중복 경고가 없다", () => {
+    const r = okCheck({
+      ...base,
+      existing: {
+        ...NO_EXISTING,
+        otherAnnualDebt: 분할상환_연간원리금,
+        creditInstallmentBalance: 8_000 * 만원,
+      },
+      newLoan: 신규신용대출,
+    });
+
+    expect(r.warnings.join(" ")).not.toContain("두 번 더해집니다");
+    // 잔액을 이미 입력했으므로 조건부 안내도 뜨지 않는다
+    expect(r.warnings.join(" ")).not.toContain("1억원 판정에 반영");
+  });
+
+  it("3-b. 일시상환 잔액과 함께 넣으면 기존 중복 경고는 그대로 뜬다", () => {
+    const r = okCheck({
+      ...base,
+      existing: {
+        ...NO_EXISTING,
+        otherAnnualDebt: 600 * 만원,
+        creditBalance: 3_000 * 만원,
+        creditInstallmentBalance: 8_000 * 만원,
+        creditRatePercent: 5.5,
+      },
+      newLoan: 신규신용대출,
+    });
+    expect(r.warnings.join(" ")).toContain("두 번 더해집니다");
+  });
+
+  it("3-c. 신규가 신용대출 + 기타 부채만 있고 잔액이 비면 조건부 안내를 띄운다", () => {
+    const r = okCheck({
+      ...base,
+      existing: { ...NO_EXISTING, otherAnnualDebt: 분할상환_연간원리금 },
+      newLoan: 신규신용대출,
+    });
+    expect(r.warnings.join(" ")).toContain("1억원 판정에 반영");
+  });
+
+  it("3-d. 신규가 주담대면 조건부 안내를 띄우지 않는다", () => {
+    const r = okCheck({
+      ...base,
+      existing: { ...NO_EXISTING, otherAnnualDebt: 분할상환_연간원리금 },
+      newLoan: MORTGAGE_30E,
+    });
+    expect(r.warnings.join(" ")).not.toContain("1억원 판정에 반영");
+  });
+
+  it("4. 추정 가능액의 1억원 경계가 적격 분할상환 잔액을 포함한다", () => {
+    const mk = (annualIncome: number, installment: number) =>
+      okEstimate({
+        annualIncome,
+        existing: { ...NO_EXISTING, creditInstallmentBalance: installment },
+        limitPercent: 40,
+        newLoan: {
+          kind: "credit",
+          amount: 0,
+          ratePercent: 5.5,
+          repaymentKind: "lumpSum",
+          fixedTerm: "other",
+        },
+        asOf: BEFORE_EXPIRY,
+      });
+
+    // 같은 소득이라도 분할상환 잔액이 있으면 총잔액이 1억원을 넘어 스트레스 구간으로 넘어간다
+    const 없음 = mk(3_000 * 만원, 0);
+    const 구천 = mk(3_000 * 만원, 9_000 * 만원);
+
+    expect(없음.effectiveStressRate).toBe(0); // 총잔액 1억원 이하 구간
+    expect(구천.effectiveStressRate).toBe(1.5); // 잔액 9천 + 신규 → 1억원 초과
+    expect(구천.estimatedPrincipal).toBeLessThan(없음.estimatedPrincipal);
+
+    // 이미 1억원을 넘겼으면 처음부터 스트레스 구간
+    expect(mk(3_000 * 만원, 11_000 * 만원).effectiveStressRate).toBe(1.5);
+  });
+
+  it("4-b. 경계에서 잘릴 때 남은 여력이 적격 분할상환 잔액을 반영한다", () => {
+    // 잔액 9천만원 → 무스트레스 여력은 1천만원까지.
+    // 경계에 걸리는 소득 구간을 찾아 잘린 값이 정확히 1천만원인지 확인한다.
+    let capped = null as ReturnType<typeof okEstimate> | null;
+    for (let 소득 = 400; 소득 <= 1_200; 소득 += 10) {
+      const r = okEstimate({
+        annualIncome: 소득 * 만원,
+        existing: { ...NO_EXISTING, creditInstallmentBalance: 9_000 * 만원 },
+        limitPercent: 40,
+        newLoan: {
+          kind: "credit",
+          amount: 0,
+          ratePercent: 5.5,
+          repaymentKind: "lumpSum",
+          fixedTerm: "other",
+        },
+        asOf: BEFORE_EXPIRY,
+      });
+      if (r.cappedAtCreditGate) {
+        capped = r;
+        break;
+      }
+    }
+
+    expect(capped).not.toBeNull();
+    // 1억원 − 기존 9천만원 = 1천만원
+    expect(capped!.estimatedPrincipal).toBe(1_000 * 만원);
+    expect(capped!.effectiveStressRate).toBe(0);
   });
 });
