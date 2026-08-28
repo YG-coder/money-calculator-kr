@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { OG_IMAGE } from "@/lib/metadata";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://머니계산기.kr"),
@@ -47,12 +48,16 @@ export const metadata: Metadata = {
     siteName: "머니계산기",
     locale: "ko_KR",
     type: "website",
+    // 각 페이지는 buildMetadata 로 자기 openGraph 를 만들어 덮어쓴다.
+    // 여기는 그걸 빠뜨린 페이지가 생겼을 때의 기본값이다.
+    images: [OG_IMAGE],
   },
 
   twitter: {
     card: "summary_large_image",
     title: "머니계산기 | 무료 금융·부동산 계산기",
     description: "대출이자·원리금·취득세·월세 vs 전세 계산기를 무료로 이용하세요.",
+    images: [OG_IMAGE.url],
   },
 
   robots: { index: true, follow: true },
