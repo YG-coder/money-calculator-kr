@@ -3,12 +3,12 @@ import type { Metadata } from "next";
 export const SITE_NAME = "머니계산기";
 
 /**
- * 콘텐츠 발행 주체. Article 구조화 데이터의 author·publisher 로 쓴다.
+ * 콘텐츠 작성 주체. 블로그 화면과 Article 구조화 데이터의 author 로 쓴다.
  *
- * ⚠️ About 페이지에 실제로 적혀 있는 운영자다. 개인 실명이 확인되지 않았으므로
- *    Organization 으로 둔다. 없는 사람을 만들어 넣지 않는다.
+ * 개인 실명이나 별도 운영사 브랜드를 전면에 내세우지 않고, 사이트 안에서
+ * 일관되게 이해되는 편집 주체 명칭을 사용한다.
  */
-export const SITE_AUTHOR = "Incomelab (인컴랩)";
+export const SITE_AUTHOR = "머니계산기 편집팀";
 export const BASE_URL = "https://머니계산기.kr";
 
 /**
