@@ -15,11 +15,10 @@ export default function Page() {
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <h1 className="mb-2 text-3xl font-black text-slate-900">면책 고지</h1>
       <p className="mb-8 text-sm text-slate-400">
-        Disclaimer · 최종 갱신: 2026년 5월 4일
+        Disclaimer · 최종 갱신: 2026년 8월 29일
       </p>
 
       <div className="space-y-8 rounded-2xl border border-slate-100 bg-white p-8 text-[15px] leading-relaxed text-slate-600 shadow-sm">
-
         {/* 도입 */}
         <section>
           <p>
@@ -47,8 +46,8 @@ export default function Page() {
             <li className="flex gap-3">
               <span className="shrink-0 text-brand-600">•</span>
               <span>
-                본 사이트는 공인된 금융 자문 기관, 세무사, 변호사가 아니며,
-                관련 법령에 따른 <strong>금융투자업·세무대리업·법무 자문</strong>을
+                본 사이트는 공인된 금융 자문 기관, 세무사, 변호사가 아니며, 관련
+                법령에 따른 <strong>금융투자업·세무대리업·법무 자문</strong>을
                 수행하지 않습니다.
               </span>
             </li>
@@ -68,17 +67,14 @@ export default function Page() {
             2. 계산 결과의 한계
           </h2>
           <p className="mb-3">
-            본 사이트의 계산기는 표준 공식(원리금균등 상환 PMT, 만기일시 단순
-            이자, 양도소득세 과세표준 산식 등)을 기준으로 결과를 제공합니다.
-            그러나 다음 요인으로 인해 실제 금융기관·세무 당국의 산정 결과와
-            차이가 있을 수 있습니다.
+            본 사이트의 계산기는 대출 상환 공식과 공개된 금융·부동산 정책 기준을
+            바탕으로 결과를 제공합니다. 그러나 다음 요인으로 인해 실제
+            금융기관·세무 당국의 산정 결과와 차이가 있을 수 있습니다.
           </p>
           <ul className="space-y-2.5 text-sm">
             <li className="flex gap-3">
               <span className="shrink-0 text-brand-600">•</span>
-              <span>
-                금융기관별 우대금리·가산금리·신용가산료·취급수수료
-              </span>
+              <span>금융기관별 우대금리·가산금리·신용가산료·취급수수료</span>
             </li>
             <li className="flex gap-3">
               <span className="shrink-0 text-brand-600">•</span>
@@ -89,15 +85,15 @@ export default function Page() {
             <li className="flex gap-3">
               <span className="shrink-0 text-brand-600">•</span>
               <span>
-                보유 주택 수, 조정대상지역 지정 여부, 1세대 1주택 비과세 요건,
-                일시적 2주택 특례, 장기보유특별공제 등 세제상 개별 조건
+                보유 주택 수, 조정대상지역 지정 여부, 일시적 2주택·생애최초 감면
+                등 세제상 개별 조건
               </span>
             </li>
             <li className="flex gap-3">
               <span className="shrink-0 text-brand-600">•</span>
               <span>
-                정부 정책 변경, 세법 개정, 한국은행 기준금리 조정 등 시점에
-                따른 변동
+                정부 정책 변경, 세법 개정, 한국은행 기준금리 조정 등 시점에 따른
+                변동
               </span>
             </li>
           </ul>
@@ -113,8 +109,8 @@ export default function Page() {
             3. 정보의 시점
           </h2>
           <p>
-            세제, 금융 규제, 금리 환경은 정부 정책에 따라 자주 변경됩니다.
-            본 사이트의 모든 글에는 <strong>작성·갱신 시점</strong>이 명시되어
+            세제, 금융 규제, 금리 환경은 정부 정책에 따라 자주 변경됩니다. 본
+            사이트의 모든 글에는 <strong>작성·갱신 시점</strong>이 명시되어
             있으며, 이후 개정 사항이 반영되지 않은 경우가 있을 수 있습니다.
             중요한 의사결정 시점에서는 반드시 최신 법령과 정책을 직접 확인해
             주시기 바랍니다.
@@ -175,7 +171,7 @@ export default function Page() {
                 >
                   www.nts.go.kr
                 </a>
-                ) — 양도소득세, 취득세, 종합부동산세 등 세금 안내
+                ) — 국세 신고와 세금 안내
               </span>
             </li>
             <li className="flex gap-3">
@@ -226,7 +222,10 @@ export default function Page() {
             <li className="flex gap-3">
               <span className="shrink-0 text-brand-600">•</span>
               <span>
-                <strong className="text-slate-800">국토교통부 부동산공시가격알리미</strong> (
+                <strong className="text-slate-800">
+                  국토교통부 부동산공시가격알리미
+                </strong>{" "}
+                (
                 <a
                   href="https://www.realtyprice.kr"
                   target="_blank"
@@ -247,15 +246,13 @@ export default function Page() {
             6. 광고 및 제휴 정책
           </h2>
           <p className="mb-3">
-            본 사이트는 운영 비용 충당을 위해 향후 디스플레이 광고를 게재할 수
-            있습니다. 다만 광고 게재 여부는 다음 원칙을 따릅니다.
+            본 사이트는 운영 비용 충당을 위해 Google AdSense 등 디스플레이
+            광고를 게재할 수 있습니다. 광고 운영은 다음 원칙을 따릅니다.
           </p>
           <ul className="space-y-2 text-sm">
             <li className="flex gap-3">
               <span className="shrink-0 text-brand-600">•</span>
-              <span>
-                광고는 콘텐츠와 명확히 구분되도록 표시합니다.
-              </span>
+              <span>광고는 콘텐츠와 명확히 구분되도록 표시합니다.</span>
             </li>
             <li className="flex gap-3">
               <span className="shrink-0 text-brand-600">•</span>
@@ -267,8 +264,7 @@ export default function Page() {
             <li className="flex gap-3">
               <span className="shrink-0 text-brand-600">•</span>
               <span>
-                특정 금융 상품을 광고가 아닌 콘텐츠로 위장해 추천하지
-                않습니다.
+                특정 금융 상품을 광고가 아닌 콘텐츠로 위장해 추천하지 않습니다.
               </span>
             </li>
           </ul>
@@ -311,6 +307,23 @@ export default function Page() {
             >
               이용약관
             </Link>
+          </p>
+          <p className="mt-3 text-sm">
+            계산기 이용은{" "}
+            <Link
+              href="/"
+              className="font-semibold text-brand-600 hover:underline"
+            >
+              홈
+            </Link>
+            에서, 계산 기준과 활용법은{" "}
+            <Link
+              href="/blog"
+              className="font-semibold text-brand-600 hover:underline"
+            >
+              금융 가이드
+            </Link>
+            에서 확인할 수 있습니다.
           </p>
         </section>
       </div>

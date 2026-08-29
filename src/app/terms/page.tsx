@@ -1,11 +1,13 @@
 // src/app/terms/page.tsx
 import type { Metadata } from "next";
+import Link from "next/link";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
   slug: "terms",
   title: "이용약관",
-  description: "머니계산기 이용약관을 안내합니다.",
+  description:
+    "머니계산기 계산 서비스와 금융 정보 콘텐츠의 이용 조건, 결과의 한계, 저작권, 광고 및 문의 방법을 안내합니다.",
 });
 
 export default function TermsPage() {
@@ -13,7 +15,7 @@ export default function TermsPage() {
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <h1 className="mb-1 text-3xl font-black text-slate-900">이용약관</h1>
       <p className="mb-8 text-sm text-slate-400">
-        최종 수정일: 2026년 4월 15일
+        최종 수정일: 2026년 8월 29일
       </p>
 
       <div className="space-y-7 rounded-2xl border border-slate-100 bg-white p-8 text-sm leading-relaxed text-slate-600 shadow-sm">
@@ -31,9 +33,10 @@ export default function TermsPage() {
             2. 서비스 내용
           </h2>
           <p>
-            본 사이트는 대출이자 계산기, 원리금상환 계산기, 전세대출 계산기,
-            중도상환 계산기 및 금융 정보 콘텐츠를 무료로 제공합니다. 서비스
-            내용은 운영상 필요에 따라 변경되거나 중단될 수 있습니다.
+            본 사이트는 대출 한도·상환, 부동산 세금·실투자금·임대수익률,
+            예·적금·복리·환전 계산기와 관련 금융 정보 콘텐츠를 무료로
+            제공합니다. 서비스 내용은 운영상 필요에 따라 변경되거나 중단될 수
+            있습니다.
           </p>
         </section>
 
@@ -95,7 +98,19 @@ export default function TermsPage() {
 
         <section>
           <h2 className="mb-2 text-base font-bold text-slate-800">
-            8. 약관 변경
+            8. 광고 및 외부 서비스
+          </h2>
+          <p>
+            본 사이트는 운영 비용을 위해 광고를 게재하거나 공식 기관의 외부
+            페이지로 연결할 수 있습니다. 광고와 외부 사이트의 상품·서비스는 해당
+            제공자의 책임으로 운영되며, 자세한 데이터 처리 방식은
+            개인정보처리방침을 확인하시기 바랍니다.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="mb-2 text-base font-bold text-slate-800">
+            9. 약관 변경
           </h2>
           <p>
             본 약관은 관련 법령, 정책 또는 서비스 운영상의 필요에 따라 변경될 수
@@ -104,7 +119,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 text-base font-bold text-slate-800">9. 문의</h2>
+          <h2 className="mb-2 text-base font-bold text-slate-800">10. 문의</h2>
           <p>
             서비스 이용과 관련한 문의 사항은 아래 이메일로 접수할 수 있습니다.
           </p>
@@ -122,6 +137,23 @@ export default function TermsPage() {
         <p className="border-t border-slate-100 pt-2 text-xs text-slate-400">
           본 약관은 머니계산기(머니계산기.kr) 서비스 이용에 적용됩니다.
         </p>
+        <nav
+          aria-label="관련 안내"
+          className="flex flex-wrap gap-3 text-xs font-semibold text-brand-600"
+        >
+          <Link href="/about" className="hover:underline">
+            사이트 소개
+          </Link>
+          <Link href="/privacy-policy" className="hover:underline">
+            개인정보처리방침
+          </Link>
+          <Link href="/disclaimer" className="hover:underline">
+            면책 고지
+          </Link>
+          <Link href="/contact" className="hover:underline">
+            문의하기
+          </Link>
+        </nav>
       </div>
     </div>
   );
