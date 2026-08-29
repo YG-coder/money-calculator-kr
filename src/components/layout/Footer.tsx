@@ -70,7 +70,9 @@ export function Footer() {
               className="mb-3 flex items-center gap-2 text-lg font-black text-white"
             >
               <span>💰</span>
-              머니<span className="text-brand-400">계산기</span>
+              <span>
+                머니<span className="text-brand-400">계산기</span>
+              </span>
             </Link>
             <p className="text-sm leading-relaxed">
               복잡한 금융 계산을 쉽고 빠르게.
