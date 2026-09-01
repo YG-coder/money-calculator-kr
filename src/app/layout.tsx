@@ -29,9 +29,7 @@ export const metadata: Metadata = {
     "머니계산기",
   ],
 
-  // 🔥 구글 + 네이버 인증 (핵심)
   verification: {
-    google: "esF2Zr1HJuwM5slp-24iq4uYhUHTAeTz49oERjMm73k",
     other: {
       "naver-site-verification": "bc4843cbf5606163e8d5e3a5433f37cfdb974828",
     },
@@ -74,14 +72,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" data-scroll-behavior="smooth">
-      <head>
-        {/* 🔥 애드센스 */}
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6405509957088169"
-          crossOrigin="anonymous"
-        />
-      </head>
       <body className="min-h-screen flex flex-col bg-slate-50 text-slate-900 antialiased">
         <Header />
         <main className="flex-1">{children}</main>
